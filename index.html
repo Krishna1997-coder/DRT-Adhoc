@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DRT Adhocs</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function showAdhocData() {
+            const adhocData = JSON.parse(localStorage.getItem('adhocData')) || [];
+            let dataHtml = '';
+
+            if (adhocData.length > 0) {
+                adhocData.forEach((data, index) => {
+                    dataHtml += `<p>${index + 1}. Login: ${data.login}, Activity: ${data.activityName}, Date: ${data.date}, Duration: ${data.duration}</p>`;
+                });
+            } else {
+                dataHtml = '<p>No past adhoc data found.</p>';
+            }
+
+            document.getElementById('pastAdhocData').innerHTML = dataHtml;
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>DRT Adhocs</h1>
+            <nav>
+                <ul>
+                    <li><a href="new_adhoc.html">Enter New Adhoc</a></li>
+                    <li><a href="#viewAdhoc" onclick="showAdhocData(); document.getElementById('pastAdhocData').style.display='block';">View Past Adhoc Data</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div id="pastAdhocData" style="display:none;">
+                <h2>Past Adhoc Data</h2>
+                <!-- Data will be dynamically added here -->
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 DRT Adhocs. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

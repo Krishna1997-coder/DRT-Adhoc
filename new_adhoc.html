@@ -5,12 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enter New Adhoc</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
     <script>
-        function saveAdhocData() {
-            const login = document.getElementById('login').value;
-            const activityName = document.getElementById('activityName').value;
+        function saveAdhocData(event) {
+            event.preventDefault();
+
+            const login = document.getElementById('login').value.trim();
+            const activityName = document.getElementById('activityName').value.trim();
             const date = document.getElementById('date').value;
-            const duration = document.getElementById('duration').value;
+            const duration = document.getElementById('duration').value.trim();
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            if (!login || !activityName || !date || !duration) {
+                errorMessage.textContent = "All fields are required.";
+                errorMessage.style.display = "block";
+                successMessage.style.display = "none";
+                return;
+            }
+
+            if (isNaN(duration) || duration <= 0) {
+                errorMessage.textContent = "Please enter a valid duration in minutes.";
+                errorMessage.style.display = "block";
+                successMessage.style.display = "none";
+                return;
+            }
 
             const adhocData = {
                 login,
@@ -23,7 +42,11 @@
             pastAdhocs.push(adhocData);
             localStorage.setItem('adhocData', JSON.stringify(pastAdhocs));
 
-            alert('Adhoc data saved successfully!');
+            successMessage.textContent = 'Adhoc data saved successfully!';
+            successMessage.style.display = "block";
+            errorMessage.style.display = "none";
+
+            document.getElementById('adhocForm').reset();
         }
     </script>
 </head>
@@ -37,7 +60,7 @@
     <main>
         <div class="container">
             <h2>Enter New Adhoc Details</h2>
-            <form onsubmit="saveAdhocData(); return false;">
+            <form id="adhocForm" onsubmit="saveAdhocData(event);">
                 <div class="form-group">
                     <label for="login">Login:</label>
                     <input type="text" id="login" name="login" required>
@@ -54,6 +77,8 @@
                     <label for="duration">Duration (Mins):</label>
                     <input type="text" id="duration" name="duration" required>
                 </div>
+                <div id="error-message" style="display: none; color: red;"></div>
+                <div id="success-message" style="display: none; color: green;"></div>
                 <input type="submit" value="Save Adhoc">
             </form>
         </div>

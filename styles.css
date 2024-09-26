@@ -1,85 +1,99 @@
-body {
-    font-family: Arial, sans-serif;
-    background: url('ai-background.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: #333;
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
 }
 
 header {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 20px;
+    background: #333;
+    color: #fff;
+    padding: 1rem 0;
     text-align: center;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    color: white;
 }
 
-h1 {
-    font-size: 2em;
+header h1 {
+    margin: 0;
 }
 
 nav ul {
     list-style: none;
     padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
 }
 
 nav ul li {
-    margin: 0 15px;
+    display: inline;
+    margin-right: 10px;
 }
 
 nav ul li a {
-    color: #e0e0e0;
+    color: #fff;
     text-decoration: none;
-    font-size: 1.2em;
-    transition: color 0.3s;
+    padding: 5px 10px;
+    border-radius: 5px;
 }
 
 nav ul li a:hover {
-    color: #00e676;
+    background: #575757;
 }
 
-.container {
-    margin-top: 100px;
-    padding: 20px;
+main {
+    padding: 20px 0;
 }
 
-form {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+main h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+label {
+    display: inline-block;
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+input[type="text"], input[type="date"] {
+    padding: 5px;
+    width: 200px;
+    margin-bottom: 10px;
+}
+
+input[type="submit"] {
+    padding: 10px 15px;
+    background: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background: #575757;
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+footer p {
+    margin: 0;
 }
 
 .form-group {
     margin-bottom: 15px;
 }
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-input[type="submit"] {
-    background: #00e676;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-input[type="submit"]:hover

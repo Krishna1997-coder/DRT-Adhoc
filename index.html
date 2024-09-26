@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRT Adhocs</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.2/xlsx.full.min.js"></script>
     <script>
         function showAdhocData() {
             const adhocData = JSON.parse(localStorage.getItem('adhocData')) || [];
@@ -12,13 +13,45 @@
 
             if (adhocData.length > 0) {
                 adhocData.forEach((data, index) => {
-                    dataHtml += `<p>${index + 1}. Login: ${data.login}, Activity: ${data.activityName}, Date: ${data.date}, Duration: ${data.duration}</p>`;
+                    dataHtml += <p>${index + 1}. Login: ${data.login}, Activity: ${data.activityName}, Date: ${data.date}, Duration: ${data.duration} mins</p>;
                 });
             } else {
                 dataHtml = '<p>No past adhoc data found.</p>';
             }
 
             document.getElementById('pastAdhocData').innerHTML = dataHtml;
+        }
+
+        function exportToExcel() {
+            const adhocData = JSON.parse(localStorage.getItem('adhocData')) || [];
+            if (adhocData.length === 0) {
+                alert("No data available to export.");
+                return;
+            }
+
+            const ws = XLSX.utils.json_to_sheet(adhocData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Adhoc Data");
+
+            XLSX.writeFile(wb, "AdhocData.xlsx");
+        }
+
+        function importFromExcel(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const adhocData = XLSX.utils.sheet_to_json(worksheet);
+
+                localStorage.setItem('adhocData', JSON.stringify(adhocData));
+                showAdhocData();
+            };
+
+            reader.readAsArrayBuffer(file);
         }
     </script>
 </head>
@@ -39,7 +72,9 @@
         <div class="container">
             <div id="pastAdhocData" style="display:none;">
                 <h2>Past Adhoc Data</h2>
-                <!-- Data will be dynamically added here -->
+                <button onclick="exportToExcel()">Export to Excel</button>
+                <input type="file" onchange="importFromExcel(event)" accept=".xlsx, .xls">
+                <div id="adhocDataContainer"></div>
             </div>
         </div>
     </main>

@@ -13,7 +13,7 @@
 
             if (adhocData.length > 0) {
                 adhocData.forEach((data, index) => {
-                    dataHtml += <p>${index + 1}. Login: ${data.login}, Activity: ${data.activityName}, Date: ${data.date}, Duration: ${data.duration} mins</p>;
+                    dataHtml += <p>${index + 1}. Login: ${data.login}, Activity: ${data.activityName}, Date: ${data.date}, Duration: ${data.duration}</p>;
                 });
             } else {
                 dataHtml = '<p>No past adhoc data found.</p>';
@@ -74,7 +74,7 @@
                 <h2>Past Adhoc Data</h2>
                 <button onclick="exportToExcel()">Export to Excel</button>
                 <input type="file" onchange="importFromExcel(event)" accept=".xlsx, .xls">
-                <div id="adhocDataContainer"></div>
+                <!-- Data will be dynamically added here -->
             </div>
         </div>
     </main>

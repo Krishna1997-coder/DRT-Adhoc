@@ -12,7 +12,7 @@
 
             if (adhocData.length > 0) {
                 adhocData.forEach((data, index) => {
-                    dataHtml += `<p>${index + 1}. Login: ${data.login}, Activity: ${data.activityName}, Date: ${data.date}, Duration(mins): ${data.duration}</p>`;
+                    dataHtml += `<p>${index + 1}. Login: ${data.login}, Activity: ${data.activityName}, Date: ${data.date}, Duration: ${data.duration}</p>`;
                 });
             } else {
                 dataHtml = '<p>No past adhoc data found.</p>';

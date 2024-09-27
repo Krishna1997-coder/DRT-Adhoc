@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Adhoc Details</title>
+    <title>DRT Adhoc</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1><a href="/Public/index.html">DRT Adhoc</a></h1>
+</head>
+<body>
+    <h1>Enter Adhoc Details</h1>
+    <form action="/saveAdhoc" method="POST">
+        <label for="loginId">Log in ID:</label>
+        <input type="text" id="loginId" name="loginId" required><br><br>
+
+        <label for="adhocActivity">Adhoc Activity:</label>
+        <input type="text" id="adhocActivity" name="adhocActivity" required><br><br>
+
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br><br>
+
+        <label for="duration">Duration (Mins):</label>
+        <input type="number" id="duration" name="duration" required><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

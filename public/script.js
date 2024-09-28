@@ -1,5 +1,6 @@
 const adhocForm = document.getElementById('adhocForm');
-const adhocsTable = document.getElementById('adhocsTable') ? document.getElementById('adhocsTable').getElementsByTagName('tbody')[0] : null;
+const adhocsTable = document.getElementById('adhocsTable') 
+const tbody = adhocsTable ? adhocsTable.getElementsByTagName('tbody')[0] : null;
 const downloadBtn = document.getElementById('downloadBtn');
 
 // Load existing adhocs from backend and display them

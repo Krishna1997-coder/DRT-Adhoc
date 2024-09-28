@@ -5,7 +5,7 @@ const downloadBtn = document.getElementById('downloadBtn');
 // Load existing adhocs from backend and display them
 window.onload = async () => {
     try {
-        const response = await fetch('http://localhost:3000/adhocs'); // Replace with your backend URL if necessary
+        const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/'); // Replace with your backend URL if necessary
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
@@ -32,7 +32,7 @@ if (adhocForm) {
 
         try {
             // Send data to the backend
-            const response = await fetch('http://localhost:3000/submit', { // Replace with your backend URL if necessary
+            const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/', { // Replace with your backend URL if necessary
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -70,7 +70,7 @@ function addRowToTable(adhoc) {
 if (downloadBtn) {
     downloadBtn.addEventListener('click', async () => {
         try {
-            const response = await fetch('http://localhost:3000/download-csv'); // Replace with your backend URL if necessary
+            const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/'); // Replace with your backend URL if necessary
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }

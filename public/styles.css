@@ -1,0 +1,81 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+}
+
+.button-container {
+    margin-top: 20px;
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input {
+    margin: 10px;
+    padding: 10px;
+    width: 200px;
+}
+
+table {
+    margin-top: 20px;
+    border-collapse: collapse;
+    width: 80%;
+}
+
+th, td {
+    border: 1px solid #333;
+    padding: 10px;
+    text-align: center;
+}
+
+tr:hover {
+    background-color: #e9ecef; /* Light background on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    body {
+        height: auto; /* Allow the height to adjust based on content */
+    }
+    
+    .button {
+        width: 100%; /* Make buttons full width on small screens */
+    }
+    
+    input {
+        width: 100%; /* Make inputs full width on small screens */
+    }
+    
+    table {
+        width: 100%; /* Full width for tables on small screens */
+    }
+}

@@ -4,11 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DRT Adhoc</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        .buttons {
+            margin: 20px 0;
+        }
+        .buttons a {
+            display: inline-block;
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            margin: 10px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-    <h1><a href="index.html">DRT Adhoc</a></h1>
-    <button onclick="window.location.href='enter_adhoc.html'">Enter Adhoc Details</button>
-    <button onclick="window.location.href='view_adhocs.html'">View Past Adhocs</button>
+    <header>
+        <a href="index.html">DRT Adhoc</a>
+    </header>
+    <div class="container">
+        <h1>Welcome to DRT Adhoc</h1>
+        <div class="buttons">
+            <a href="enter_adhoc.html">Enter Adhoc Details</a>
+            <a href="view_adhoc.html">View Past Adhocs</a>
+        </div>
+    </div>
 </body>
 </html>

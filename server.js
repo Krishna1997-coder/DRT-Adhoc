@@ -1,57 +1,71 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const fs = require('fs');
-const path = require('path');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
-// Middleware to parse JSON bodies
+// Middleware
+app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static('Public')); // Serve static files from the "Public" directory
+app.use(express.static('Public'));
 
-// Endpoint to save adhoc data
+// Load existing adhoc data from JSON file
+const loadAdhocData = () => {
+    try {
+        const dataBuffer = fs.readFileSync('data/adhocData.json');
+        return JSON.parse(dataBuffer.toString());
+    } catch (e) {
+        return [];
+    }
+};
+
+// Save adhoc data to JSON file
+const saveAdhocData = (data) => {
+    fs.writeFileSync('data/adhocData.json', JSON.stringify(data, null, 2));
+};
+
+// Route to handle submitting adhoc data
 app.post('/saveAdhoc', (req, res) => {
-    const adhocData = req.body; // Get the data from the request
-    const filePath = path.join(__dirname, 'Adhoc data', 'saveAdhoc.json'); // Path to save data
+    const { loginId, activity, date, duration } = req.body;
+    
+    if (!loginId || !activity || !date || !duration) {
+        return res.status(400).send({ error: 'All fields are required' });
+    }
 
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            console.error('Error reading file:', err);
-            return res.status(500).send('Server error');
-        }
-
-        let jsonData = [];
-        if (data.length) {
-            jsonData = JSON.parse(data); // Parse existing data if file is not empty
-        }
-        jsonData.push(adhocData); // Add new data
-
-        fs.writeFile(filePath, JSON.stringify(jsonData, null, 2), (err) => {
-            if (err) {
-                console.error('Error writing file:', err);
-                return res.status(500).send('Server error');
-            }
-            res.status(200).send('Data saved successfully');
-        });
-    });
+    const adhocData = loadAdhocData();
+    adhocData.push({ loginId, activity, date, duration });
+    saveAdhocData(adhocData);
+    res.status(201).send({ message: 'Adhoc data saved successfully!' });
 });
 
-// Endpoint to serve past adhoc data
-app.get('/viewAdhocs', (req, res) => {
-    const filePath = path.join(__dirname, 'Adhoc data', 'saveAdhoc.json'); // Path to read data
+// Route to retrieve adhoc data
+app.get('/getAdhoc', (req, res) => {
+    const adhocData = loadAdhocData();
+    res.send(adhocData);
+});
 
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            console.error('Error reading file:', err);
-            return res.status(500).send('Server error');
-        }
+// Route to download adhoc data as CSV
+app.get('/downloadAdhoc', (req, res) => {
+    const { start, end } = req.query;
+    const adhocData = loadAdhocData();
 
-        res.setHeader('Content-Type', 'application/json');
-        res.send(data); // Send the adhoc data as a response
+    const filteredData = adhocData.filter(item => {
+        const itemDate = new Date(item.date);
+        return (!start || itemDate >= new Date(start)) && (!end || itemDate <= new Date(end));
     });
+
+    let csv = 'Login ID,Activity,Date,Duration\n';
+    filteredData.forEach(item => {
+        csv += `${item.loginId},${item.activity},${item.date},${item.duration}\n`;
+    });
+
+    res.header('Content-Type', 'text/csv');
+    res.attachment('adhoc_data.csv');
+    res.send(csv);
 });
 
 // Start the server
-app.listen(PORT,'0.0.0.0', () => {
+app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });

@@ -4,73 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enter Adhoc Details</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        form {
+            background: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        form div {
+            margin-bottom: 15px;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        form input[type="text"], form input[type="date"], form input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        form input[type="submit"] {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-
-<div class="container mt-5">
-    <h1 class="text-center">Enter Adhoc Details</h1>
-    <form id="adhocForm">
-        <div class="form-group">
-            <label for="loginId">Log in ID:</label>
-            <input type="text" id="loginId" name="loginId" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="activity">Adhoc Activity:</label>
-            <input type="text" id="activity" name="activity" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="date">Date:</label>
-            <input type="date" id="date" name="date" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="duration">Duration (Minutes):</label>
-            <input type="number" id="duration" name="duration" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Submit</button>
-    </form>
-</div>
-
-<script>
-document.getElementById("adhocForm").addEventListener("submit", function(event) {
-    event.preventDefault(); // Prevent default form submission
-
-    const loginId = document.getElementById("loginId").value;
-    const activity = document.getElementById("activity").value;
-    const date = document.getElementById("date").value;
-    const duration = document.getElementById("duration").value;
-
-    const data = {
-        loginId: loginId,
-        activity: activity,
-        date: date,
-        duration: duration
-    };
-
-    fetch('/saveAdhoc', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => {
-        if (response.ok) {
-            alert('Adhoc details submitted successfully!');
-            document.getElementById("adhocForm").reset(); // Reset the form
-        } else {
-            alert('Error submitting details. Please try again.');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error submitting details. Please try again.');
-    });
-});
-</script>
-
+    <header>
+        <a href="index.html">DRT Adhoc</a>
+    </header>
+    <div class="container">
+        <h1>Enter Adhoc Details</h1>
+        <form id="adhocForm">
+            <div>
+                <label for="loginId">Log in ID:</label>
+                <input type="text" id="loginId" name="loginId" required>
+            </div>
+            <div>
+                <label for="activity">Adhoc Activity:</label>
+                <input type="text" id="activity" name="activity" required>
+            </div>
+            <div>
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div>
+                <label for="duration">Duration (Mins):</label>
+                <input type="number" id="duration" name="duration" required>
+            </div>
+            <div>
+                <input type="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>

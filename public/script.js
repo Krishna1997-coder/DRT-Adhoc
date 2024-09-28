@@ -1,12 +1,12 @@
 const adhocForm = document.getElementById('adhocForm');
-const adhocsTable = document.getElementById('adhocsTable') 
+const adhocsTable = document.getElementById('adhocsTable');
 const tbody = adhocsTable ? adhocsTable.getElementsByTagName('tbody')[0] : null;
 const downloadBtn = document.getElementById('downloadBtn');
 
 // Load existing adhocs from backend and display them
 window.onload = async () => {
     try {
-        const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/'); // Replace with your backend URL if necessary
+        const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/adhocs'); // Corrected URL
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
@@ -33,7 +33,7 @@ if (adhocForm) {
 
         try {
             // Send data to the backend
-            const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/', { // Replace with your backend URL if necessary
+            const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/submit', { // Corrected URL
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -47,7 +47,8 @@ if (adhocForm) {
                 addRowToTable(newAdhoc); // Update the table with the new entry
                 adhocForm.reset(); // Reset the form
             } else {
-                alert('Error submitting data');
+                const errorResponse = await response.json();
+                alert('Error submitting data: ' + JSON.stringify(errorResponse.errors)); // Show validation errors
             }
         } catch (error) {
             console.error('Error:', error);
@@ -71,7 +72,7 @@ function addRowToTable(adhoc) {
 if (downloadBtn) {
     downloadBtn.addEventListener('click', async () => {
         try {
-            const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/'); // Replace with your backend URL if necessary
+            const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/download-csv'); // Update if needed
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }

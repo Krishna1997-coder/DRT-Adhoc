@@ -4,34 +4,92 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Past Adhocs</title>
-    <script src="script.js"></script>
-    <title>DRT Adhoc</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        header a {
+            color: #fff;
+            text-decoration: none;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        table th {
+            background-color: #333;
+            color: #fff;
+        }
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        table tr:hover {
+            background-color: #ddd;
+        }
+        #filter-container {
+            margin: 20px 0;
+        }
+        #filter-container input {
+            padding: 8px;
+            margin-right: 10px;
+        }
+        #downloadCsv {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <h1><a href="/Public/index.html">DRT Adhoc</a></h1>
-</head>
-<body>
-    <h1>Past Adhoc Details</h1>
-    <table id="adhocTable" border="1">
-        <thead>
-            <tr>
-                <th>Log in ID</th>
-                <th>Adhoc Activity</th>
-                <th>Date</th>
-                <th>Duration (Mins)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be populated here by script.js -->
-        </tbody>
-    </table>
-    <br>
-    <label for="startDate">Start Date:</label>
-    <input type="date" id="startDate">
-    <label for="endDate">End Date:</label>
-    <input type="date" id="endDate">
-    <button onclick="downloadCSV()">Download CSV</button>
+        <a href="index.html">DRT Adhoc</a>
+    </header>
+    <div class="container">
+        <h1>View Past Adhocs</h1>
+        <div id="filter-container">
+            <label for="startDate">Start Date:</label>
+            <input type="date" id="startDate">
+            <label for="endDate">End Date:</label>
+            <input type="date" id="endDate">
+            <button id="downloadCsv">Download CSV</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Log in ID</th>
+                    <th>Adhoc Activity</th>
+                    <th>Date</th>
+                    <th>Duration (Mins)</th>
+                </tr>
+            </thead>
+            <tbody id="adhocTableBody">
+                <!-- Data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>

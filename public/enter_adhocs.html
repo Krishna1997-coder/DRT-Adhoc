@@ -15,15 +15,36 @@
     <main>
         <form id="adhocForm">
             <input type="text" id="loginId" placeholder="Login ID" required>
-            <input type="text" id="adhocActivity" placeholder="Adhoc Activity" required>
+            
+            <label for="adhocActivity"></label>
+            <select id="adhocActivity" name="adhocActivity" required>
+                <option value="">Select Activity</option>
+                <option value="Ops Calibration Connect">Ops Calibration Connect</option>
+                <option value="OSE Calibration Connect">OSE Calibration Connect</option>
+                <option value="Data Analysis">Data Analysis</option>
+                <option value="FFR Quip Update">FFR Quip Update</option>
+                <option value="Revalidation Audit Count">Revalidation Audit Count</option>
+                <option value="Revalidation Sorting & Allocation">Revalidation Sorting & Allocation</option>
+                <option value="Others">Others</option>
+            </select>
+
+            <div id="countContainer" style="display:none;">
+                <input type="number" id="count" placeholder="Count">
+            </div>
+
+            <div id="otherActivityContainer" style="display:none;">
+                <input type="text" id="otherActivity" placeholder="Activity Name">
+            </div>
+            
             <input type="text" id="duration" placeholder="Duration (mins)" required>
             <input type="date" id="date" required>
             <button type="submit">Submit</button>
         </form>
     </main>
     <footer>
-        <p>&copy; 2024 DRT Adhocs. All rights reserved.</p>
+        <p>&copy; Designed by Murali Krishna.</p>
     </footer>
     <script src="script.js"></script>
 </body>
 </html>
+

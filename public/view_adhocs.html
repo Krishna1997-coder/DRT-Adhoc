@@ -7,12 +7,48 @@
     <meta name="keywords" content="DRT, Adhocs, management">
     <title>View Adhocs</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Styles for the filter form */
+        #filterForm {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        #filterForm label {
+            margin-right: 5px;
+        }
+
+        #filterForm input {
+            margin-right: 10px;
+            padding: 5px;
+        }
+
+        /* Styles to align the date inputs side by side */
+        .date-filters {
+            display: flex;
+            align-items: center;
+            margin-right: 20px; /* Add space between filters and button */
+        }
+    </style>
 </head>
 <body>
     <header>
         <h1><a href="index.html">DRT Adhocs</a></h1>
     </header>
     <main>
+        <h2>Filter Adhocs</h2>
+        <form id="filterForm">
+            <div class="date-filters">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate">
+
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate">
+            </div>
+            <button type="submit">Filter</button>
+        </form>
+
         <table id="adhocsTable">
             <thead>
                 <tr>
@@ -29,7 +65,7 @@
         <button id="downloadBtn">Download CSV</button>
     </main>
     <footer>
-        <p>&copy; 2024 DRT Adhocs. All rights reserved.</p>
+        <p>&copy; Designed by Murali Krishna.</p>
     </footer>
     <script src="script.js"></script>
 </body>

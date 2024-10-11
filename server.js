@@ -20,8 +20,8 @@ app.use(express.static('public'));
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+    .then(() => console.log('MongoDB connected'))
+    .catch(err => console.error('MongoDB connection error:', err));
 
 // Endpoint to handle form submission
 app.post('/submit', [
@@ -47,10 +47,20 @@ app.post('/submit', [
     }
 });
 
-// Endpoint to retrieve past adhoc activities
+// Endpoint to retrieve past adhoc activities with optional date filtering
 app.get('/adhocs', async (req, res) => {
+    const { startDate, endDate } = req.query; // Get the date range from query parameters
+
+    const filter = {};
+    if (startDate) {
+        filter.date = { ...filter.date, $gte: new Date(startDate) }; // Greater than or equal to start date
+    }
+    if (endDate) {
+        filter.date = { ...filter.date, $lte: new Date(endDate) }; // Less than or equal to end date
+    }
+
     try {
-        const adhocs = await Adhoc.find({});
+        const adhocs = await Adhoc.find(filter);
 
         if (adhocs.length === 0) {
             return res.status(204).send(); // No content
@@ -63,6 +73,7 @@ app.get('/adhocs', async (req, res) => {
     }
 });
 
+// Endpoint to download CSV of Adhoc activities
 app.get('/download-csv', async (req, res) => {
     try {
         const adhocs = await Adhoc.find({});

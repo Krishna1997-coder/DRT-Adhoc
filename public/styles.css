@@ -1,27 +1,59 @@
+/* General Styles */
+html, body {
+    height: 100%; /* Ensure body takes full height */
+    margin: 0; /* Remove default margins */
+  
+}
+
 body {
+    
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
+    flex-direction: column; /* Stack children vertically */
+    align-items: center; /* Center items horizontally */
+    justify-content: center; /* Center items vertically */
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #b0f0b5;
 }
 
 h1 {
-    color: #333;
-    text-align: center;
+    font-size: 2.5em; /* Increase font size */
+    font-weight: bold; /* Make the text bold */
+    text-align: center; /* Center the heading */
+    margin: 20px 0; /* Add margin for spacing */
+    color: #333; /* Dark text color for contrast */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
 }
 
+h1 a {
+    display: inline-block; /* Make link block for better padding */
+    padding: 10px 20px; /* Add padding around the link */
+    background-color: blanchedalmond; /* Background color */
+    color: #556B2F; /* Text color */
+    text-decoration: none; /* Remove underline */
+    border-radius: 5px; /* Round the corners */
+    transition: background-color 0.3s, color 0.3s; /* Add transition for hover effects */
+}
+
+h1 a:hover {
+    background-color: #f5e6a8; /* Change background on hover */
+    color: #000000; /* Change text color on hover */
+}
+
+h1 a:focus {
+    outline: 2px solid #007BFF; /* Focus outline for accessibility */
+}
+
+/* Button Styles */
 .button-container {
+    display: flex; /* Use flexbox to arrange buttons side by side */
+    justify-content: center; /* Center the buttons horizontally */
     margin-top: 20px;
 }
 
 .button {
     display: inline-block;
     padding: 10px 20px;
-    margin: 10px;
+    margin: 10px; /* Margin between buttons */
     background-color: #007BFF;
     color: white;
     text-decoration: none;
@@ -30,21 +62,46 @@ h1 {
 }
 
 .button:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Darker on hover */
 }
 
+.button:focus {
+    outline: 2px solid #0056b3; /* Add focus outline */
+}
+
+.button:disabled {
+    background-color: #ccc; /* Grey out disabled buttons */
+    cursor: not-allowed;
+}
+
+.button:active {
+    background-color: #0056b3; /* Darker background when button is pressed */
+}
+
+/* Form Styles */
 form {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin: 20px 0; /* Add margin around form */
 }
 
-input {
+input, select {
     margin: 10px;
     padding: 10px;
     width: 200px;
+    box-sizing: border-box; /* Ensure padding doesn't affect total width */
 }
 
+/* Containers */
+#countContainer, #otherActivityContainer {
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* Center content vertically */
+}
+
+/* Table Styles */
 table {
     margin-top: 20px;
     border-collapse: collapse;
@@ -63,19 +120,30 @@ tr:hover {
 
 /* Responsive Design */
 @media (max-width: 600px) {
-    body {
-        height: auto; /* Allow the height to adjust based on content */
-    }
-    
     .button {
         width: 100%; /* Make buttons full width on small screens */
     }
     
-    input {
+    input, select {
         width: 100%; /* Make inputs full width on small screens */
     }
     
     table {
         width: 100%; /* Full width for tables on small screens */
     }
+}
+
+@media (max-width: 900px) {
+    table {
+        font-size: 14px; /* Adjust font size for tablets */
+    }
+}
+
+/* Footer Styles */
+footer {
+    background-color: #b0f0b5; /* Background color for the footer */
+    padding: 10px 0; /* Padding for better spacing */
+    text-align: center; /* Center footer text */
+    margin-top: auto; /* Push footer to the bottom */
+    width: 100%; /* Ensure footer takes full width */
 }

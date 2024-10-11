@@ -2,15 +2,23 @@ const adhocForm = document.getElementById('adhocForm');
 const adhocsTable = document.getElementById('adhocsTable');
 const tbody = adhocsTable ? adhocsTable.getElementsByTagName('tbody')[0] : null;
 const downloadBtn = document.getElementById('downloadBtn');
+const filterForm = document.getElementById('filterForm'); // Add this line to select the filter form
 
 // Load existing adhocs from backend and display them
 window.onload = async () => {
+    await loadAdhocs(); // Load all adhocs on page load
+}
+
+// Function to load adhocs and populate the table
+async function loadAdhocs(startDate = '', endDate = '') {
     try {
-        const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/adhocs'); // Corrected URL
+        const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/adhocs?startDate=${startDate}&endDate=${endDate}`); // Corrected URL with query parameters
         if (!response.ok) {
             throw new Error('Network response was not ok ' + response.statusText);
         }
         const adhocs = await response.json();
+        // Clear existing rows before adding new ones
+        tbody.innerHTML = '';
         adhocs.forEach(adhoc => {
             addRowToTable(adhoc);
         });
@@ -28,8 +36,19 @@ if (adhocForm) {
         const activity = document.getElementById('adhocActivity').value;
         const duration = document.getElementById('duration').value;
         const date = document.getElementById('date').value;
+        const count = document.getElementById('count') ? document.getElementById('count').value : null;
+        const otherActivity = document.getElementById('otherActivity') ? document.getElementById('otherActivity').value : null;
 
-        const newAdhoc = { loginID: loginId, activity, duration, date };
+        const newAdhoc = { 
+            loginID: loginId, 
+            activity: activity === 'Others' ? otherActivity : activity, 
+            duration, 
+            date 
+        };
+
+        if (activity === 'Revalidation Audit Count') {
+            newAdhoc.count = count;
+        }
 
         try {
             // Send data to the backend
@@ -46,6 +65,8 @@ if (adhocForm) {
                 alert(result.message); // Show success message
                 addRowToTable(newAdhoc); // Update the table with the new entry
                 adhocForm.reset(); // Reset the form
+                document.getElementById('countContainer').style.display = 'none';
+                document.getElementById('otherActivityContainer').style.display = 'none';
             } else {
                 const errorResponse = await response.json();
                 alert('Error submitting data: ' + JSON.stringify(errorResponse.errors)); // Show validation errors
@@ -65,6 +86,9 @@ function addRowToTable(adhoc) {
         row.insertCell(1).innerText = adhoc.activity;
         row.insertCell(2).innerText = adhoc.duration;
         row.insertCell(3).innerText = adhoc.date;
+        if (adhoc.count) {
+            row.insertCell(4).innerText = adhoc.count;
+        }
     }
 }
 
@@ -88,5 +112,37 @@ if (downloadBtn) {
         } catch (error) {
             console.error('Error downloading CSV:', error);
         }
+    });
+}
+
+// Handle dropdown changes to show/hide additional fields
+const adhocActivity = document.getElementById('adhocActivity');
+const countContainer = document.getElementById('countContainer');
+const otherActivityContainer = document.getElementById('otherActivityContainer');
+
+adhocActivity.addEventListener('change', (event) => {
+    const selectedActivity = event.target.value;
+
+    if (selectedActivity === 'Revalidation Audit Count') {
+        countContainer.style.display = 'block';
+        otherActivityContainer.style.display = 'none';
+    } else if (selectedActivity === 'Others') {
+        countContainer.style.display = 'none';
+        otherActivityContainer.style.display = 'block';
+    } else {
+        countContainer.style.display = 'none';
+        otherActivityContainer.style.display = 'none';
+    }
+});
+
+// Add event listener for the filter form submission
+if (filterForm) {
+    filterForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        
+        // Load adhocs based on the date range
+        await loadAdhocs(startDate, endDate);
     });
 }

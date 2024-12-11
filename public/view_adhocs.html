@@ -1,67 +1,72 @@
-<document.addEventListener('DOMContentLoaded', () => {
-    const adhocs = [
-        // Sample data; replace this with real data or fetch from a backend
-        { loginID: 'user1', activity: 'Review Documents', duration: 30, date: '2024-12-01' },
-        { loginID: 'user2', activity: 'Prepare Report', duration: 45, date: '2024-12-02' },
-        // Add more sample data as needed
-    ];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View DRT Adhocs">
+    <meta name="keywords" content="DRT, Adhocs, management">
+    <title>View Adhocs</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Styles for the filter form */
+        #filterForm {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
 
-    const filterForm = document.getElementById('filterForm');
-    const adhocsTable = document.getElementById('adhocsTable').querySelector('tbody');
-    const downloadBtn = document.getElementById('downloadBtn');
+        #filterForm label {
+            margin-right: 5px;
+        }
 
-    const populateTable = (data) => {
-        adhocsTable.innerHTML = '';
-        data.forEach(adhoc => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${adhoc.loginID}</td>
-                <td>${adhoc.activity}</td>
-                <td>${adhoc.duration}</td>
-                <td>${adhoc.date}</td>
-            `;
-            adhocsTable.appendChild(row);
-        });
-    };
+        #filterForm input {
+            margin-right: 10px;
+            padding: 5px;
+        }
 
-    const filterAdhocs = (startDate, endDate) => {
-        return adhocs.filter(adhoc => {
-            const adhocDate = new Date(adhoc.date);
-            return (!startDate || adhocDate >= new Date(startDate)) &&
-                   (!endDate || adhocDate <= new Date(endDate));
-        });
-    };
+        /* Styles to align the date inputs side by side */
+        .date-filters {
+            display: flex;
+            align-items: center;
+            margin-right: 20px; /* Add space between filters and button */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">DRT Adhocs</a></h1>
+    </header>
+    <main>
+        <h2>Filter Adhocs</h2>
+        <form id="filterForm">
+            <div class="date-filters">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate">
 
-    filterForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        const filteredAdhocs = filterAdhocs(startDate, endDate);
-        populateTable(filteredAdhocs);
-    });
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate">
+            </div>
+            <button type="submit">Filter</button>
+        </form>
 
-    const downloadCSV = (data) => {
-        const csvContent = 'data:text/csv;charset=utf-8,'
-            + ['Login ID,Adhoc Activity,Duration (mins),Date']
-                .concat(data.map(adhoc => `${adhoc.loginID},${adhoc.activity},${adhoc.duration},${adhoc.date}`))
-                .join('\n');
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement('a');
-        link.setAttribute('href', encodedUri);
-        link.setAttribute('download', 'adhocs.csv');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-    downloadBtn.addEventListener('click', () => {
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        const filteredAdhocs = filterAdhocs(startDate, endDate);
-        downloadCSV(filteredAdhocs);
-    });
-
-    // Initial population of the table
-    populateTable(adhocs);
-});
+        <table id="adhocsTable">
+            <thead>
+                <tr>
+                    <th>Login ID</th>
+                    <th>Adhoc Activity</th>
+                    <th>Duration (mins)</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Adhocs will be dynamically inserted here -->
+            </tbody>
+        </table>
+        <button id="downloadBtn">Download CSV</button>
+    </main>
+    <footer>
+        <p>&copy; Designed by Murali Krishna.</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>

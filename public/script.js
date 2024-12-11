@@ -33,11 +33,16 @@ if (adhocForm) {
         e.preventDefault();
         
         const loginId = document.getElementById('loginId').value;
-        const activity = document.getElementById('adhocActivity').value;
-        const duration = document.getElementById('duration').value;
+        let activity = document.getElementById('adhocActivity').value;
+        let duration = document.getElementById('duration').value;
         const date = document.getElementById('date').value;
         const count = document.getElementById('count') ? document.getElementById('count').value : null;
         const otherActivity = document.getElementById('otherActivity') ? document.getElementById('otherActivity').value : null;
+
+        if (activity === 'Revalidation Audit Count' && count) {
+            activity = `${activity} (${count})`;
+            duration = count * 3; // Calculate duration based on count
+        }
 
         const newAdhoc = { 
             loginID: loginId, 
@@ -45,10 +50,6 @@ if (adhocForm) {
             duration, 
             date 
         };
-
-        if (activity === 'Revalidation Audit Count') {
-            newAdhoc.count = count;
-        }
 
         try {
             // Send data to the backend
@@ -86,9 +87,6 @@ function addRowToTable(adhoc) {
         row.insertCell(1).innerText = adhoc.activity;
         row.insertCell(2).innerText = adhoc.duration;
         row.insertCell(3).innerText = adhoc.date;
-        if (adhoc.count) {
-            row.insertCell(4).innerText = adhoc.count;
-        }
     }
 }
 

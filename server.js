@@ -29,14 +29,25 @@ app.post('/submit', [
     body('activity').notEmpty().withMessage('Activity is required'),
     body('date').isISO8601().withMessage('Date must be in ISO format'),
     body('duration').notEmpty().withMessage('Duration is required'),
+    body('count').optional().isInt({ gt: 0 }).withMessage('Count must be a positive integer')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { loginID, activity, date, duration } = req.body;
-    const newActivity = new Adhoc({ loginID, activity, date, duration });
+    const { loginID, activity, date, duration, count } = req.body;
+
+    let finalDuration = duration;
+    let finalActivity = activity;
+
+    // Calculate duration based on count for "Revalidation Audit Count"
+    if (activity === 'Revalidation Audit Count' && count) {
+        finalDuration = count * 3; // Each count represents 3 minutes
+        finalActivity = `${activity} (${count})`;
+    }
+
+    const newActivity = new Adhoc({ loginID, activity: finalActivity, date, duration: finalDuration });
 
     try {
         const savedActivity = await newActivity.save();

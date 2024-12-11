@@ -148,9 +148,10 @@ if (filterForm) {
 
         console.log("Start Date:", startDate); // Log the start and end dates for debugging
         console.log("End Date:", endDate);
-
-        // Load adhocs based on the date range
-        await loadAdhocs(startDate, endDate);
+        if (startDate && endDate) {
+            await loadAdhocs(startDate, endDate);
+        } else {
+            alert('Please select both start and end dates.');
+        }
     });
 }
-S

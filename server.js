@@ -61,7 +61,8 @@ app.post('/submit', [
 // Endpoint to retrieve past adhoc activities with optional date filtering
 app.get('/adhocs', async (req, res) => {
     const { startDate, endDate } = req.query; // Get the date range from query parameters
-
+    console.log("Start Date:", startDate);
+    console.log('Received endDate:', endDate);
     const filter = {};
     if (startDate) {
         filter.date = { ...filter.date, $gte: new Date(startDate) }; // Greater than or equal to start date

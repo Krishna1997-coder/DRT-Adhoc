@@ -137,12 +137,12 @@ adhocActivity.addEventListener('change', (event) => {
 
 // Add event listener for the filter form to load filtered adhocs
 if (filterForm) {
-    filterForm.addEventListener('submit', (e) => {
+    filterForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
 
-        loadAdhocs(startDate, endDate); // Reload the table with filtered data
+        await loadAdhocs(startDate, endDate); // Reload the table with filtered data
     });
 }

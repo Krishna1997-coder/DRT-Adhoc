@@ -18,10 +18,12 @@ async function loadAdhocs(startDate = '', endDate = '') {
         }
         const adhocs = await response.json();
         // Clear existing rows before adding new ones
-        tbody.innerHTML = '';
-        adhocs.forEach(adhoc => {
-            addRowToTable(adhoc);
-        });
+        if (tbody) {
+            tbody.innerHTML = '';
+            adhocs.forEach(adhoc => {
+                addRowToTable(adhoc);
+            });
+        }
     } catch (error) {
         console.error('Error fetching adhocs:', error);
     }
@@ -81,8 +83,8 @@ if (adhocForm) {
 
 // Function to add a row to the table
 function addRowToTable(adhoc) {
-    if (adhocsTable) {
-        const row = adhocsTable.insertRow();
+    if (adhocsTable && tbody) {
+        const row = tbody.insertRow();
         row.insertCell(0).innerText = adhoc.loginID;
         row.insertCell(1).innerText = adhoc.activity;
         row.insertCell(2).innerText = adhoc.duration;
@@ -133,14 +135,14 @@ adhocActivity.addEventListener('change', (event) => {
     }
 });
 
-// Add event listener for the filter form submission
+// Add event listener for the filter form to load filtered adhocs
 if (filterForm) {
-    filterForm.addEventListener('submit', async (e) => {
+    filterForm.addEventListener('submit', (e) => {
         e.preventDefault();
+
         const startDate = document.getElementById('startDate').value;
         const endDate = document.getElementById('endDate').value;
-        
-        // Load adhocs based on the date range
-        await loadAdhocs(startDate, endDate);
+
+        loadAdhocs(startDate, endDate); // Reload the table with filtered data
     });
 }

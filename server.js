@@ -29,7 +29,7 @@ app.post('/submit', [
     body('activity').notEmpty().withMessage('Activity is required'),
     body('date').isISO8601().withMessage('Date must be in ISO format'),
     body('duration').notEmpty().withMessage('Duration is required'),
-    body('count').optional().isInt({ gt: 0 }).withMessage('Count must be a positive integer')
+    body('count').optional().isInt({ gt: 0 }).withMessage('Count must be a positive integer') // Added validation for count
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -44,7 +44,7 @@ app.post('/submit', [
     // Calculate duration based on count for "Revalidation Audit Count"
     if (activity === 'Revalidation Audit Count' && count) {
         finalDuration = count * 3; // Each count represents 3 minutes
-        finalActivity = `${activity} (${count})`;
+        finalActivity = `${activity} (${count})`; // Add count to activity name
     }
 
     const newActivity = new Adhoc({ loginID, activity: finalActivity, date, duration: finalDuration });
@@ -63,12 +63,20 @@ app.get('/adhocs', async (req, res) => {
     const { startDate, endDate } = req.query; // Get the date range from query parameters
     console.log("Start Date:", startDate);
     console.log('Received endDate:', endDate);
+
     const filter = {};
+
+    // Convert start and end dates to Date objects if present
     if (startDate) {
-        filter.date = { ...filter.date, $gte: new Date(startDate) }; // Greater than or equal to start date
+        const start = new Date(startDate);
+        start.setHours(0, 0, 0, 0); // Normalize time to 00:00:00
+        filter.date = { ...filter.date, $gte: start }; // Greater than or equal to start date
     }
+
     if (endDate) {
-        filter.date = { ...filter.date, $lte: new Date(endDate) }; // Less than or equal to end date
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999); // Normalize time to 23:59:59.999
+        filter.date = { ...filter.date, $lte: end }; // Less than or equal to end date
     }
 
     try {

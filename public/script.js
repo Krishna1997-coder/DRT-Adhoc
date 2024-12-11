@@ -74,6 +74,7 @@ if (adhocForm) {
                 adhocForm.reset(); // Reset the form
                 document.getElementById('countContainer').style.display = 'none';
                 document.getElementById('otherActivityContainer').style.display = 'none';
+                durationField.disabled = false; // Re-enable duration field after form submission
             } else {
                 const errorResponse = await response.json();
                 alert('Error submitting data: ' + JSON.stringify(errorResponse.errors)); // Show validation errors
@@ -120,9 +121,9 @@ if (downloadBtn) {
 }
 
 // Handle dropdown changes to show/hide additional fields
+const adhocActivity = document.getElementById('adhocActivity');
 adhocActivity.addEventListener('change', (event) => {
     const selectedActivity = event.target.value;
-
     if (selectedActivity === 'Revalidation Audit Count') {
         countContainer.style.display = 'block';
         otherActivityContainer.style.display = 'none';
@@ -138,3 +139,18 @@ adhocActivity.addEventListener('change', (event) => {
     }
 });
 
+// Add event listener for the filter form submission
+if (filterForm) {
+    filterForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        console.log("Start Date:", startDate); // Log the start and end dates for debugging
+        console.log("End Date:", endDate);
+
+        // Load adhocs based on the date range
+        await loadAdhocs(startDate, endDate);
+    });
+}
+S

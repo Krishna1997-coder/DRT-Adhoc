@@ -2,7 +2,10 @@ const adhocForm = document.getElementById('adhocForm');
 const adhocsTable = document.getElementById('adhocsTable');
 const tbody = adhocsTable ? adhocsTable.getElementsByTagName('tbody')[0] : null;
 const downloadBtn = document.getElementById('downloadBtn');
-const filterForm = document.getElementById('filterForm'); // Add this line to select the filter form
+const filterForm = document.getElementById('filterForm');
+const durationField = document.getElementById('duration'); // Get the duration field
+const countContainer = document.getElementById('countContainer'); // Get the count container
+const otherActivityContainer = document.getElementById('otherActivityContainer'); // Get the other activity container
 
 // Load existing adhocs from backend and display them
 window.onload = async () => {
@@ -41,9 +44,10 @@ if (adhocForm) {
         const count = document.getElementById('count') ? document.getElementById('count').value : null;
         const otherActivity = document.getElementById('otherActivity') ? document.getElementById('otherActivity').value : null;
 
+        // If activity is 'Revalidation Audit Count', calculate duration automatically
         if (activity === 'Revalidation Audit Count' && count) {
             activity = `${activity} (${count})`;
-            duration = count * 3; // Calculate duration based on count
+            duration = count * 3; // Automatically calculate duration
         }
 
         const newAdhoc = { 
@@ -116,33 +120,21 @@ if (downloadBtn) {
 }
 
 // Handle dropdown changes to show/hide additional fields
-const adhocActivity = document.getElementById('adhocActivity');
-const countContainer = document.getElementById('countContainer');
-const otherActivityContainer = document.getElementById('otherActivityContainer');
-
 adhocActivity.addEventListener('change', (event) => {
     const selectedActivity = event.target.value;
 
     if (selectedActivity === 'Revalidation Audit Count') {
         countContainer.style.display = 'block';
         otherActivityContainer.style.display = 'none';
+        durationField.disabled = true; // Disable the duration field for Revalidation Audit Count
     } else if (selectedActivity === 'Others') {
         countContainer.style.display = 'none';
         otherActivityContainer.style.display = 'block';
+        durationField.disabled = false; // Enable the duration field for other activities
     } else {
         countContainer.style.display = 'none';
         otherActivityContainer.style.display = 'none';
+        durationField.disabled = false; // Enable the duration field for other activities
     }
 });
 
-// Add event listener for the filter form to load filtered adhocs
-if (filterForm) {
-    filterForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        await loadAdhocs(startDate, endDate); // Reload the table with filtered data
-    });
-}

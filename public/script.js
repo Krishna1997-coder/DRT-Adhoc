@@ -3,9 +3,9 @@ const adhocsTable = document.getElementById('adhocsTable');
 const tbody = adhocsTable ? adhocsTable.getElementsByTagName('tbody')[0] : null;
 const downloadBtn = document.getElementById('downloadBtn');
 const filterForm = document.getElementById('filterForm');
-const durationField = document.getElementById('duration'); // Get the duration field
-const countContainer = document.getElementById('countContainer'); // Get the count container
-const otherActivityContainer = document.getElementById('otherActivityContainer'); // Get the other activity container
+const durationField = document.getElementById('duration');
+const countContainer = document.getElementById('countContainer');
+const otherActivityContainer = document.getElementById('otherActivityContainer');
 
 // Check if adhocActivity element exists
 const adhocActivity = document.getElementById('adhocActivity');

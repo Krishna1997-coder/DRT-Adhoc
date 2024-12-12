@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DoD Metrics Entry">
+    <meta name="keywords" content="DRT, DoD, Metrics, management">
+    <title>DoD Metrics Entry</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">DRT Adhocs</a></h1>
+    </header>
+    <main>
+        <h2>Select Date</h2>
+        <input type="date" id="dodDate">
+        <button id="loadMetricsBtn">Load Metrics</button>
+
+        <!-- Table for entering DoD metrics -->
+        <table id="dodMetricsTable">
+            <thead>
+                <tr>
+                    <th>Login ID</th>
+                    <th>Job Count</th>
+                    <th>TAKT</th>
+                    <th>Live Productivity (hrs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Metrics will be dynamically inserted here -->
+            </tbody>
+        </table>
+
+        <!-- Button to save the entered metrics -->
+        <button id="saveMetricsBtn">Save Metrics</button>
+
+        <!-- Success message container -->
+        <div id="successMessage" style="display:none; color: green;">Data saved successfully!</div>
+    </main>
+    <footer>
+        <p>&copy; 2024 DRT Adhocs. All rights reserved.</p>
+    </footer>
+    <script src="dod_entry_script.js"></script>
+</body>
+</html>

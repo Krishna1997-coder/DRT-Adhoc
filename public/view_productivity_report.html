@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View Productivity Report">
+    <meta name="keywords" content="DRT, Productivity, Report">
+    <title>View Productivity Report</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1><a href="index.html">DRT Adhocs</a></h1>
+    </header>
+    <main>
+        <h2>View Productivity Report</h2>
+        
+        <!-- Date filter form -->
+        <div id="filterContainer">
+            <h3>Filter by Date</h3>
+            <form id="filterForm">
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" name="startDate">
+
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" name="endDate">
+
+                <button type="submit" id="loadReportBtn">Load Report</button>
+            </form>
+        </div>
+
+        <!-- Table to display productivity report -->
+        <table id="productivityReportTable">
+            <thead>
+                <tr>
+                    <th>Login ID</th>
+                    <th>Job Count</th>
+                    <th>TAKT</th>
+                    <th>Live Productivity (hrs)</th>
+                    <th>Total Adhocs (hrs)</th>
+                    <th>Total Productivity (hrs)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Productivity report will be dynamically inserted here -->
+            </tbody>
+        </table>
+
+        <!-- Button to download the report in CSV format -->
+        <button id="downloadBtn">Download CSV</button>
+    </main>
+    <footer>
+        <p>&copy; 2024 DRT Adhocs. All rights reserved.</p>
+    </footer>
+    <script src="view_report_script.js"></script>
+</body>
+</html>
+

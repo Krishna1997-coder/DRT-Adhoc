@@ -2,17 +2,16 @@
 html, body {
     height: 100%; /* Ensure body takes full height */
     margin: 0; /* Remove default margins */
-  
 }
 
 body {
-    
     display: flex;
     flex-direction: column; /* Stack children vertically */
     align-items: center; /* Center items horizontally */
-    justify-content: center; /* Center items vertically */
+    justify-content: flex-start; /* Align content at the top */
     font-family: Arial, sans-serif;
     background-color: #b0f0b5;
+    padding: 0 10px; /* Add padding to prevent content from touching edges */
 }
 
 h1 {
@@ -104,14 +103,17 @@ input, select {
 /* Table Styles */
 table {
     margin-top: 20px;
+    max-height: 60vh;   /* Limit the height of the table to 60% of the viewport */
+    overflow-y: auto;   /* Enable scrolling if content exceeds max height */
     border-collapse: collapse;
-    width: 80%;
+    width: 100%;        /* Make table full width */
 }
 
 th, td {
     border: 1px solid #333;
     padding: 10px;
     text-align: center;
+    word-wrap: break-word;
 }
 
 tr:hover {

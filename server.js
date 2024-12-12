@@ -76,13 +76,13 @@ app.get('/adhocs', async (req, res) => {
 
     if (startDate) {
         const start = new Date(startDate);
-        start.setHours(0, 0, 0, 0);
+        start.setHours(0, 0, 0, 0); // Set time to the start of the day
         filter.date = { ...filter.date, $gte: start };
     }
 
     if (endDate) {
         const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
+        end.setHours(23, 59, 59, 999); // Set time to the end of the day
         filter.date = { ...filter.date, $lte: end };
     }
 

@@ -23,7 +23,7 @@ const dodMetricsSchema = new mongoose.Schema({
 const DodMetrics = mongoose.model('DodMetrics', dodMetricsSchema);
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000; // Use Heroku's port or default to 3000
 
 // Middleware
 app.use(bodyParser.json());
@@ -97,9 +97,10 @@ app.get('/adhocs', async (req, res) => {
 
 // Endpoint to save DoD metrics data
 app.post('/save-dod-metrics', async (req, res) => {
-    const { metricsData } = req.body;
+    const { metricsData, fixedAuditors } = req.body;
 
     try {
+        // Loop through the metricsData and save each metric to the database
         for (const metric of metricsData) {
             const newDodMetric = new DodMetrics({
                 date: metric.date,
@@ -120,10 +121,8 @@ app.post('/save-dod-metrics', async (req, res) => {
 });
 
 // New endpoint for generating the productivity report
-app.get('/get-productivity-report', async (req, res) => {
-    const { startDate, endDate } = req.query;
-
-    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
+app.post('/get-productivity-report', async (req, res) => {
+    const { startDate, endDate, fixedAuditors } = req.body;
 
     try {
         const adhocs = await Adhoc.find({
@@ -142,6 +141,7 @@ app.get('/get-productivity-report', async (req, res) => {
 
         const reportData = [];
 
+        // Use the passed fixedAuditors list
         for (const auditor of fixedAuditors) {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
@@ -168,9 +168,7 @@ app.get('/get-productivity-report', async (req, res) => {
 
 // Endpoint to download CSV of productivity report
 app.get('/download-productivity-report-csv', async (req, res) => {
-    const { startDate, endDate } = req.query;
-
-    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
+    const { startDate, endDate, fixedAuditors } = req.query;
 
     try {
         const adhocs = await Adhoc.find({

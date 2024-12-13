@@ -9,9 +9,7 @@ const { Parser } = require('json2csv');
 
 // Import the Adhoc and DodMetrics models
 const Adhoc = require('./models/adhoc');
-const DodMetrics = require('./models/dodMetrics');  
-console.log('DodMetrics:', DodMetrics); // Check if this logs the model constructor
-
+const DodMetrics = require('./models/dodMetrics'); // Ensure this path is correct
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -22,7 +20,10 @@ app.use(cors());
 app.use(express.static('public'));
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
@@ -139,14 +140,12 @@ app.get('/get-productivity-report', async (req, res) => {
             const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
             const takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
-            const liveProductivity = (jobCount * takt) / 3600;
 
             reportData.push({
                 loginID: auditor,
                 jobCount,
                 takt,
-                totalAdhocs,
-                liveProductivity
+                totalAdhocs
             });
         }
 

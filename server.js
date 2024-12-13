@@ -9,7 +9,7 @@ const { Parser } = require('json2csv');
 
 // Import the Adhoc and DodMetrics models
 const Adhoc = require('./models/adhoc');
-const DodMetrics = require('./models/dodMetrics'); // Ensure this path is correct
+const DodMetrics = require('./models/dodMetrics');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -114,13 +114,7 @@ app.post('/save-dod-metrics', async (req, res) => {
 app.get('/get-productivity-report', async (req, res) => {
     const { startDate, endDate } = req.query;
 
-    const fixedAuditors = [
-        'carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 
-        'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 
-        'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 
-        'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 
-        'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'
-    ];
+    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
     try {
         const adhocs = await Adhoc.find({
@@ -137,24 +131,32 @@ app.get('/get-productivity-report', async (req, res) => {
             }
         });
 
-        const reportData = fixedAuditors.map(auditor => {
+        const reportData = [];
+        const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
+
+        for (const auditor of fixedAuditors) {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
 
-            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0)/60;
+            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
-            const takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
-            const liveProductivity = (jobCount * takt) / 3600;
+            let takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
+            let liveProductivity = 0;
 
-            return {
+            if (!isSingleDay && jobCount > 0) {
+                takt = takt / jobCount; // Calculate average TAKT for multiple days
+            }
+
+            liveProductivity = (jobCount * takt) / 3600; // Calculate live productivity in hours
+
+            reportData.push({
                 loginID: auditor,
                 jobCount,
                 takt,
-                totalAdhocs,
-                liveProductivity,
-                totalProductivity: liveProductivity + totalAdhocs
-            };
-        });
+                totalAdhocs: totalAdhocs / 60, // Convert total adhocs to hours
+                liveProductivity
+            });
+        }
 
         res.status(200).json(reportData);
 
@@ -168,13 +170,7 @@ app.get('/get-productivity-report', async (req, res) => {
 app.get('/download-productivity-report-csv', async (req, res) => {
     const { startDate, endDate } = req.query;
 
-    const fixedAuditors = [
-        'carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 
-        'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 
-        'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 
-        'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 
-        'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'
-    ];
+    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
     try {
         const adhocs = await Adhoc.find({
@@ -191,41 +187,50 @@ app.get('/download-productivity-report-csv', async (req, res) => {
             }
         });
 
-        const reportData = fixedAuditors.map(auditor => {
+        const reportData = [];
+        const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
+
+        for (const auditor of fixedAuditors) {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
 
             const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
-            const takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
-            const liveProductivity = (jobCount * takt) / 3600;
+            let takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
+            let liveProductivity = 0;
 
-            return {
+            if (!isSingleDay && jobCount > 0) {
+                takt = takt / jobCount; // Calculate average TAKT for multiple days
+            }
+
+            liveProductivity = (jobCount * takt) / 3600; // Calculate live productivity in hours
+
+            reportData.push({
                 loginID: auditor,
                 jobCount,
                 takt,
-                totalAdhocs,
-                liveProductivity,
-                totalProductivity: liveProductivity + totalAdhocs
-            };
-        });
+                totalAdhocs: totalAdhocs / 60, // Convert total adhocs to hours
+                liveProductivity
+            });
+        }
 
         // Create CSV from the report data
-        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity', 'totalProductivity'] });
+        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity'] });
         const csv = csvParser.parse(reportData);
 
-        // Send the CSV as a downloadable file
-        res.header('Content-Type', 'text/csv');
-        res.attachment('productivity_report.csv');
-        res.send(csv);
-
-    } catch (error) {
-        console.error('Error generating productivity report CSV:', error);
-        res.status(500).json({ message: 'Internal Server Error' });
-    }
-});
-
-// Start the server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+                // Send the CSV as a downloadable file
+                res.header('Content-Type', 'text/csv');
+                res.attachment('productivity_report.csv');
+                res.send(csv);
+        
+            } catch (error) {
+                console.error('Error generating productivity report CSV:', error);
+                res.status(500).json({ message: 'Internal Server Error' });
+            }
+        });
+        
+        // Start the server
+        app.listen(port, () => {
+            console.log(`Server is running on http://localhost:${port}`);
+        });
+        

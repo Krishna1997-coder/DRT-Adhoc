@@ -8,7 +8,7 @@ const { body, validationResult } = require('express-validator');
 const { Parser } = require('json2csv');
 
 // Import the Adhoc model
-const Adhoc = require('./models/adhoc');
+const Adhoc = require('./models/adhoc'); // Adjust the path as necessary
 
 // Create a schema for DoD metrics data
 const dodMetricsSchema = new mongoose.Schema({
@@ -23,7 +23,7 @@ const dodMetricsSchema = new mongoose.Schema({
 const DodMetrics = mongoose.model('DodMetrics', dodMetricsSchema);
 
 const app = express();
-const port = process.env.PORT || 3000; // Use Heroku's port or default to 3000
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
@@ -40,8 +40,7 @@ app.post('/submit', [
     body('loginID').notEmpty().withMessage('Login ID is required'),
     body('activity').notEmpty().withMessage('Activity is required'),
     body('date').isISO8601().withMessage('Date must be in ISO format'),
-    body('duration').notEmpty().withMessage('Duration is required'),
-    body('count').optional().isInt({ gt: 0 }).withMessage('Count must be a positive integer')
+    body('duration').notEmpty().isInt({ gt: 0 }).withMessage('Duration must be a positive integer')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -50,7 +49,7 @@ app.post('/submit', [
 
     const { loginID, activity, date, duration, count } = req.body;
 
-    let finalDuration = duration;
+    let finalDuration = parseInt(duration);
     let finalActivity = activity;
 
     if (activity === 'Revalidation Audit Count' && count) {
@@ -58,7 +57,7 @@ app.post('/submit', [
         finalActivity = `${activity} (${count})`;
     }
 
-    const newActivity = new Adhoc({ loginID, activity: finalActivity, date, duration: finalDuration });
+    const newActivity = new Adhoc({ loginID, activity: finalActivity, date: new Date(date), duration: finalDuration });
 
     try {
         const savedActivity = await newActivity.save();
@@ -76,13 +75,13 @@ app.get('/adhocs', async (req, res) => {
 
     if (startDate) {
         const start = new Date(startDate);
-        start.setHours(0, 0, 0, 0); // Set time to the start of the day
+        start.setHours(0, 0, 0, 0);
         filter.date = { ...filter.date, $gte: start };
     }
 
     if (endDate) {
         const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999); // Set time to the end of the day
+        end.setHours(23, 59, 59, 999);
         filter.date = { ...filter.date, $lte: end };
     }
 
@@ -97,13 +96,12 @@ app.get('/adhocs', async (req, res) => {
 
 // Endpoint to save DoD metrics data
 app.post('/save-dod-metrics', async (req, res) => {
-    const { metricsData, fixedAuditors } = req.body;
+    const { metricsData } = req.body;
 
     try {
-        // Loop through the metricsData and save each metric to the database
         for (const metric of metricsData) {
             const newDodMetric = new DodMetrics({
-                date: metric.date,
+                date: new Date(metric.date),
                 loginID: metric.loginID,
                 jobCount: metric.jobCount,
                 takt: metric.takt,
@@ -121,8 +119,10 @@ app.post('/save-dod-metrics', async (req, res) => {
 });
 
 // New endpoint for generating the productivity report
-app.post('/get-productivity-report', async (req, res) => {
-    const { startDate, endDate, fixedAuditors } = req.body;
+app.get('/get-productivity-report', async (req, res) => {
+    const { startDate, endDate } = req.query;
+
+    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
     try {
         const adhocs = await Adhoc.find({
@@ -141,7 +141,6 @@ app.post('/get-productivity-report', async (req, res) => {
 
         const reportData = [];
 
-        // Use the passed fixedAuditors list
         for (const auditor of fixedAuditors) {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
@@ -168,7 +167,9 @@ app.post('/get-productivity-report', async (req, res) => {
 
 // Endpoint to download CSV of productivity report
 app.get('/download-productivity-report-csv', async (req, res) => {
-    const { startDate, endDate, fixedAuditors } = req.query;
+    const { startDate, endDate } = req.query;
+
+    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
     try {
         const adhocs = await Adhoc.find({
@@ -203,11 +204,9 @@ app.get('/download-productivity-report-csv', async (req, res) => {
             });
         }
 
-        // Create CSV from the report data
         const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs'] });
         const csv = csvParser.parse(reportData);
 
-        // Send the CSV as a downloadable file
         res.header('Content-Type', 'text/csv');
         res.attachment('productivity_report.csv');
         res.send(csv);

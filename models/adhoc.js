@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 const activitySchema = new mongoose.Schema({
     loginID: { type: String, required: true },    // Ensure loginID is required
     activity: { type: String, required: true },   // Ensure activity is required
-    date: { type: String, required: true },        // Ensure date is required
-    duration: { type: String, required: true }     // Ensure duration is required
+    date: { type: Date, required: true },         // Change date type to Date
+    duration: { type: Number, required: true }    // Change duration type to Number
 },{ timestamps: true });
 
 // Create the model from the schema
@@ -13,3 +13,4 @@ const Activity = mongoose.model('Activity', activitySchema);
 
 // Export the model so it can be imported in server.js
 module.exports = Activity;
+

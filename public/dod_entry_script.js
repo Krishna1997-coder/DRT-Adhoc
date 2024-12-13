@@ -11,7 +11,7 @@ document.getElementById('loadMetricsBtn').addEventListener('click', async () => 
 });
 
 async function loadMetrics(date) {
-    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer','ukamsuma', 'vodelm']; // Replace with actual auditor names
+    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
     const tbody = document.getElementById('dodMetricsTable').getElementsByTagName('tbody')[0];
     tbody.innerHTML = ''; // Clear existing rows
 
@@ -30,6 +30,7 @@ document.getElementById('saveMetricsBtn').addEventListener('click', async () => 
     const tableRows = document.querySelectorAll('#dodMetricsTable tbody tr');
     
     const metricsData = [];
+    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
     tableRows.forEach(row => {
         const loginID = row.cells[0].innerText;
@@ -37,7 +38,7 @@ document.getElementById('saveMetricsBtn').addEventListener('click', async () => 
         const takt = row.cells[2].getElementsByTagName('input')[0].value;
 
         // Calculate live productivity
-        const liveProductivity = (jobCount * takt)/3600;
+        const liveProductivity = (jobCount * takt) / 3600; // Assuming takt is in seconds
         row.cells[3].innerText = liveProductivity.toFixed(2); // Update live productivity cell
 
         // Collect data to send to the backend
@@ -52,12 +53,12 @@ document.getElementById('saveMetricsBtn').addEventListener('click', async () => 
 
     // Send data to backend for saving
     try {
-        const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/save-dod-metrics', { // Replace with your actual backend URL
+        const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/save-dod-metrics', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ metricsData, fixedAuditors })
+            body: JSON.stringify({ metricsData })
         });
 
         if (response.ok) {

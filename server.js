@@ -7,20 +7,9 @@ const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
 const { Parser } = require('json2csv');
 
-// Import the Adhoc model
-const Adhoc = require('./models/adhoc'); // Adjust the path as necessary
-
-// Create a schema for DoD metrics data
-const dodMetricsSchema = new mongoose.Schema({
-    date: Date,
-    loginID: String,
-    jobCount: Number,
-    takt: Number,
-    liveProductivity: Number
-});
-
-// Create a model for DoD metrics
-const DodMetrics = mongoose.model('DodMetrics', dodMetricsSchema);
+// Import the Adhoc and DodMetrics models
+const Adhoc = require('./models/adhoc');
+const DodMetrics = require('./models/dodMetrics');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -40,7 +29,7 @@ app.post('/submit', [
     body('loginID').notEmpty().withMessage('Login ID is required'),
     body('activity').notEmpty().withMessage('Activity is required'),
     body('date').isISO8601().withMessage('Date must be in ISO format'),
-    body('duration').notEmpty().isInt({ gt: 0 }).withMessage('Duration must be a positive integer')
+    body('duration').isNumeric().withMessage('Duration must be a number')
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -49,7 +38,7 @@ app.post('/submit', [
 
     const { loginID, activity, date, duration, count } = req.body;
 
-    let finalDuration = parseInt(duration);
+    let finalDuration = duration;
     let finalActivity = activity;
 
     if (activity === 'Revalidation Audit Count' && count) {
@@ -57,7 +46,7 @@ app.post('/submit', [
         finalActivity = `${activity} (${count})`;
     }
 
-    const newActivity = new Adhoc({ loginID, activity: finalActivity, date: new Date(date), duration: finalDuration });
+    const newActivity = new Adhoc({ loginID, activity: finalActivity, date, duration: finalDuration });
 
     try {
         const savedActivity = await newActivity.save();
@@ -101,7 +90,7 @@ app.post('/save-dod-metrics', async (req, res) => {
     try {
         for (const metric of metricsData) {
             const newDodMetric = new DodMetrics({
-                date: new Date(metric.date),
+                date: metric.date,
                 loginID: metric.loginID,
                 jobCount: metric.jobCount,
                 takt: metric.takt,
@@ -148,12 +137,14 @@ app.get('/get-productivity-report', async (req, res) => {
             const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
             const takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
+            const liveProductivity = (jobCount * takt) / 3600;
 
             reportData.push({
                 loginID: auditor,
                 jobCount,
                 takt,
-                totalAdhocs
+                totalAdhocs,
+                liveProductivity
             });
         }
 
@@ -195,18 +186,22 @@ app.get('/download-productivity-report-csv', async (req, res) => {
             const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
             const takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
+            const liveProductivity = (jobCount * takt) / 3600;
 
             reportData.push({
                 loginID: auditor,
                 jobCount,
                 takt,
-                totalAdhocs
+                totalAdhocs,
+                liveProductivity
             });
         }
 
-        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs'] });
+        // Create CSV from the report data
+        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity'] });
         const csv = csvParser.parse(reportData);
 
+        // Send the CSV as a downloadable file
         res.header('Content-Type', 'text/csv');
         res.attachment('productivity_report.csv');
         res.send(csv);

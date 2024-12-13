@@ -9,7 +9,7 @@ const { Parser } = require('json2csv');
 
 // Import the Adhoc and DodMetrics models
 const Adhoc = require('./models/adhoc');
-const DodMetrics = require('./models/dodMetrics');
+const DodMetrics = require('./models/dodMetrics'); // Ensure this path is correct
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -116,6 +116,8 @@ app.get('/get-productivity-report', async (req, res) => {
 
     const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
+    const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
+
     try {
         const adhocs = await Adhoc.find({
             date: {
@@ -132,28 +134,23 @@ app.get('/get-productivity-report', async (req, res) => {
         });
 
         const reportData = [];
-        const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
 
         for (const auditor of fixedAuditors) {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
 
-            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
+            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0) / 60; // Convert to hours
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
-            let takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
-            let liveProductivity = 0;
+            const totalTakt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
+            const takt = isSingleDay ? totalTakt : totalTakt / dodMetricData.length; // Calculate average TAKT if multi-day
 
-            if (!isSingleDay && jobCount > 0) {
-                takt = takt / jobCount; // Calculate average TAKT for multiple days
-            }
-
-            liveProductivity = (jobCount * takt) / 3600; // Calculate live productivity in hours
+            const liveProductivity = (jobCount * takt) / 3600; // Convert to hours
 
             reportData.push({
                 loginID: auditor,
                 jobCount,
                 takt,
-                totalAdhocs: totalAdhocs / 60, // Convert total adhocs to hours
+                totalAdhocs,
                 liveProductivity
             });
         }
@@ -172,6 +169,8 @@ app.get('/download-productivity-report-csv', async (req, res) => {
 
     const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
+    const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
+
     try {
         const adhocs = await Adhoc.find({
             date: {
@@ -188,28 +187,23 @@ app.get('/download-productivity-report-csv', async (req, res) => {
         });
 
         const reportData = [];
-        const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
 
         for (const auditor of fixedAuditors) {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
 
-            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
+            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0) / 60; // Convert to hours
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
-            let takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
-            let liveProductivity = 0;
+            const totalTakt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
+            const takt = isSingleDay ? totalTakt : totalTakt / dodMetricData.length; // Calculate average TAKT if multi-day
 
-            if (!isSingleDay && jobCount > 0) {
-                takt = takt / jobCount; // Calculate average TAKT for multiple days
-            }
-
-            liveProductivity = (jobCount * takt) / 3600; // Calculate live productivity in hours
+            const liveProductivity = (jobCount * takt) / 3600; // Convert to hours
 
             reportData.push({
                 loginID: auditor,
                 jobCount,
                 takt,
-                totalAdhocs: totalAdhocs / 60, // Convert total adhocs to hours
+                totalAdhocs,
                 liveProductivity
             });
         }
@@ -218,19 +212,18 @@ app.get('/download-productivity-report-csv', async (req, res) => {
         const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity'] });
         const csv = csvParser.parse(reportData);
 
-                // Send the CSV as a downloadable file
-                res.header('Content-Type', 'text/csv');
-                res.attachment('productivity_report.csv');
-                res.send(csv);
-        
-            } catch (error) {
-                console.error('Error generating productivity report CSV:', error);
-                res.status(500).json({ message: 'Internal Server Error' });
-            }
-        });
-        
-        // Start the server
-        app.listen(port, () => {
-            console.log(`Server is running on http://localhost:${port}`);
-        });
-        
+        // Send the CSV as a downloadable file
+        res.header('Content-Type', 'text/csv');
+        res.attachment('productivity_report.csv');
+        res.send(csv);
+
+    } catch (error) {
+        console.error('Error generating productivity report CSV:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+
+// Start the server
+app.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+});

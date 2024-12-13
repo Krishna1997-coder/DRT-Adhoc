@@ -30,17 +30,14 @@ async function loadProductivityReport(startDate, endDate) {
             row.insertCell(1).innerText = data.jobCount;
             row.insertCell(2).innerText = data.takt;
 
-            // Calculate live productivity
-            const liveProductivity = data.liveProductivity;
-            row.insertCell(3).innerText = liveProductivity.toFixed(2); // Live productivity (hrs)
+            // Live productivity (hrs)
+            row.insertCell(3).innerText = data.liveProductivity.toFixed(2);
 
-            // Get total adhocs for the login
-            const totalAdhocs = data.totalAdhocs; // Already in hours
-            row.insertCell(4).innerText = totalAdhocs.toFixed(2); // Total adhocs (hrs)
+            // Total adhocs (hrs)
+            row.insertCell(4).innerText = data.totalAdhocs.toFixed(2);
 
-            // Calculate total productivity
-            const totalProductivity = liveProductivity + totalAdhocs;
-            row.insertCell(5).innerText = totalProductivity.toFixed(2); // Total productivity (hrs)
+            // Total productivity (hrs)
+            row.insertCell(5).innerText = (data.liveProductivity + data.totalAdhocs).toFixed(2);
         });
     } catch (error) {
         console.error('Error loading productivity report:', error);

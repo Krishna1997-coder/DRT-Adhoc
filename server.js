@@ -10,6 +10,8 @@ const { Parser } = require('json2csv');
 // Import the Adhoc and DodMetrics models
 const Adhoc = require('./models/adhoc');
 const DodMetrics = require('./models/dodMetrics');
+console.log('DodMetrics:', DodMetrics); // Check if this logs the model constructor
+
 
 const app = express();
 const port = process.env.PORT || 3000;

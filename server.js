@@ -141,7 +141,7 @@ app.get('/get-productivity-report', async (req, res) => {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
 
-            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
+            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0)/60;
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
             const takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
             const liveProductivity = (jobCount * takt) / 3600;

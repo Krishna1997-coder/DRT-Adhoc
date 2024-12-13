@@ -2,9 +2,8 @@ document.getElementById('loadReportBtn').addEventListener('click', async () => {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
 
-    // Validate if the dates are provided
     if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
+        alert('Please select both start and end dates.');
         return;
     }
 
@@ -20,7 +19,6 @@ async function loadProductivityReport(startDate, endDate) {
         }
 
         const reportData = await response.json();
-        
         const tbody = document.getElementById('productivityReportTable').getElementsByTagName('tbody')[0];
         tbody.innerHTML = ''; // Clear existing rows
 
@@ -29,36 +27,25 @@ async function loadProductivityReport(startDate, endDate) {
             row.insertCell(0).innerText = data.loginID;
             row.insertCell(1).innerText = data.jobCount;
             row.insertCell(2).innerText = data.takt;
-
-            // Calculate live productivity
-            const liveProductivity = (data.jobCount * data.takt) / 3600; // Assuming takt is in seconds
-            row.insertCell(3).innerText = liveProductivity.toFixed(2); // Live productivity (hrs)
-
-            // Get total adhocs for the login
-            const totalAdhocs = data.totalAdhocs; // Get this data from the backend
-            row.insertCell(4).innerText = totalAdhocs.toFixed(2); // Total adhocs (hrs)
-
-            // Calculate total productivity
-            const totalProductivity = liveProductivity + totalAdhocs;
-            row.insertCell(5).innerText = totalProductivity.toFixed(2); // Total productivity (hrs)
+            row.insertCell(3).innerText = data.liveProductivity.toFixed(2); // Live productivity (hrs)
+            row.insertCell(4).innerText = data.totalAdhocs.toFixed(2); // Total adhocs (hrs)
+            row.insertCell(5).innerText = data.totalProductivity.toFixed(2); // Total productivity (hrs)
         });
     } catch (error) {
         console.error('Error loading productivity report:', error);
     }
 }
 
-// Add event listener for the download CSV button
 document.getElementById('downloadBtn').addEventListener('click', async () => {
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-
-    // Validate if the dates are provided
-    if (!startDate || !endDate) {
-        alert("Please select both start and end dates.");
-        return;
-    }
-
     try {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates.');
+            return;
+        }
+
         const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/download-productivity-report-csv?startDate=${startDate}&endDate=${endDate}`);
         
         if (!response.ok) {

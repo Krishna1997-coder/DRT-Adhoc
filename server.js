@@ -114,7 +114,13 @@ app.post('/save-dod-metrics', async (req, res) => {
 app.get('/get-productivity-report', async (req, res) => {
     const { startDate, endDate } = req.query;
 
-    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
+    const fixedAuditors = [
+        'carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 
+        'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 
+        'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 
+        'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 
+        'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'
+    ];
 
     try {
         const adhocs = await Adhoc.find({
@@ -131,23 +137,24 @@ app.get('/get-productivity-report', async (req, res) => {
             }
         });
 
-        const reportData = [];
-
-        for (const auditor of fixedAuditors) {
+        const reportData = fixedAuditors.map(auditor => {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
 
             const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0);
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
             const takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
+            const liveProductivity = (jobCount * takt) / 3600;
 
-            reportData.push({
+            return {
                 loginID: auditor,
                 jobCount,
                 takt,
-                totalAdhocs
-            });
-        }
+                totalAdhocs,
+                liveProductivity,
+                totalProductivity: liveProductivity + totalAdhocs
+            };
+        });
 
         res.status(200).json(reportData);
 
@@ -161,7 +168,13 @@ app.get('/get-productivity-report', async (req, res) => {
 app.get('/download-productivity-report-csv', async (req, res) => {
     const { startDate, endDate } = req.query;
 
-    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
+    const fixedAuditors = [
+        'carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 
+        'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 
+        'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 
+        'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 
+        'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'
+    ];
 
     try {
         const adhocs = await Adhoc.find({
@@ -178,9 +191,7 @@ app.get('/download-productivity-report-csv', async (req, res) => {
             }
         });
 
-        const reportData = [];
-
-        for (const auditor of fixedAuditors) {
+        const reportData = fixedAuditors.map(auditor => {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
 
@@ -189,17 +200,18 @@ app.get('/download-productivity-report-csv', async (req, res) => {
             const takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
             const liveProductivity = (jobCount * takt) / 3600;
 
-            reportData.push({
+            return {
                 loginID: auditor,
                 jobCount,
                 takt,
                 totalAdhocs,
-                liveProductivity
-            });
-        }
+                liveProductivity,
+                totalProductivity: liveProductivity + totalAdhocs
+            };
+        });
 
         // Create CSV from the report data
-        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity'] });
+        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity', 'totalProductivity'] });
         const csv = csvParser.parse(reportData);
 
         // Send the CSV as a downloadable file

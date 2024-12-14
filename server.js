@@ -62,7 +62,7 @@ app.post('/submit', [
 
 // Endpoint to retrieve past adhoc activities with optional date filtering
 app.get('/adhocs', async (req, res) => {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, loginID } = req.query;
     const filter = {};
 
     if (startDate) {
@@ -75,6 +75,10 @@ app.get('/adhocs', async (req, res) => {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
         filter.date = { ...filter.date, $lte: end };
+    }
+
+    if (loginID) {
+        filter.loginID = loginID;
     }
 
     try {
@@ -110,13 +114,11 @@ app.post('/save-dod-metrics', async (req, res) => {
     }
 });
 
-// New endpoint for generating the productivity report
+// Endpoint to generate the productivity report
 app.get('/get-productivity-report', async (req, res) => {
     const { startDate, endDate } = req.query;
 
     const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
-
-    const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
 
     try {
         const adhocs = await Adhoc.find({
@@ -135,23 +137,32 @@ app.get('/get-productivity-report', async (req, res) => {
 
         const reportData = [];
 
+        const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
+
         for (const auditor of fixedAuditors) {
             const adhocData = adhocs.filter(item => item.loginID === auditor);
             const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
 
-            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0) / 60; // Convert to hours
+            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0) / 60; // Convert minutes to hours
             const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
-            const totalTakt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
-            const takt = isSingleDay ? totalTakt : totalTakt / dodMetricData.length; // Calculate average TAKT if multi-day
 
-            const liveProductivity = (jobCount * takt) / 3600; // Convert to hours
+            let takt;
+            if (isSingleDay) {
+                takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
+            } else {
+                const totalTakt = dodMetricData.reduce((sum, item) => sum + (item.takt * item.jobCount), 0);
+                takt = totalTakt / jobCount; // Average TAKT calculation using your formula
+            }
+
+            const liveProductivity = (jobCount * takt) / 3600; // Convert live productivity to hours
 
             reportData.push({
                 loginID: auditor,
                 jobCount,
                 takt,
+                liveProductivity,
                 totalAdhocs,
-                liveProductivity
+                totalProductivity: liveProductivity + totalAdhocs // Total productivity in hours
             });
         }
 
@@ -166,52 +177,12 @@ app.get('/get-productivity-report', async (req, res) => {
 // Endpoint to download CSV of productivity report
 app.get('/download-productivity-report-csv', async (req, res) => {
     const { startDate, endDate } = req.query;
-
-    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
-
-    const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
-
     try {
-        const adhocs = await Adhoc.find({
-            date: {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
-            }
-        });
-
-        const dodMetrics = await DodMetrics.find({
-            date: {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
-            }
-        });
-
-        const reportData = [];
-
-        for (const auditor of fixedAuditors) {
-            const adhocData = adhocs.filter(item => item.loginID === auditor);
-            const dodMetricData = dodMetrics.filter(item => item.loginID === auditor);
-
-            const totalAdhocs = adhocData.reduce((sum, item) => sum + item.duration, 0) / 60; // Convert to hours
-            const jobCount = dodMetricData.reduce((sum, item) => sum + item.jobCount, 0);
-            const totalTakt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
-            const takt = isSingleDay ? totalTakt : totalTakt / dodMetricData.length; // Calculate average TAKT if multi-day
-
-            const liveProductivity = (jobCount * takt) / 3600; // Convert to hours
-
-            reportData.push({
-                loginID: auditor,
-                jobCount,
-                takt,
-                totalAdhocs,
-                liveProductivity
-            });
-        }
-
+        const reportDataResponse = await fetch(`http://localhost:${port}/get-productivity-report?startDate=${startDate}&endDate=${endDate}`);
+        const reportData = await reportDataResponse.json();
         // Create CSV from the report data
-        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity'] });
+        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity', 'totalProductivity'] });
         const csv = csvParser.parse(reportData);
-
         // Send the CSV as a downloadable file
         res.header('Content-Type', 'text/csv');
         res.attachment('productivity_report.csv');

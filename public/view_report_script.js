@@ -45,7 +45,7 @@ async function loadProductivityReport(startDate, endDate) {
 }
 
 // Add event listener for the download button
-document.getElementById('downloadCsvBtn').addEventListener('click', async () => {
+document.getElementById('downloadProductivityBtn').addEventListener('click', async () => {
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
 

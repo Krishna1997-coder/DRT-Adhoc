@@ -86,7 +86,7 @@
     if (downloadBtn) {
         downloadBtn.addEventListener('click', async () => {
             try {
-                const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/download-csv');
+                const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/download-adhocs-csv');
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
                 }

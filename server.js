@@ -6,6 +6,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
 const { Parser } = require('json2csv');
+const fetch = require('node-fetch'); // Import fetch function from node-fetch
 
 // Import the Adhoc and DodMetrics models
 const Adhoc = require('./models/adhoc');
@@ -170,7 +171,6 @@ app.get('/get-productivity-report', async (req, res) => {
     }
 });
        
-const fetch = require('node-fetch'); // Import fetch function from node-fetch
 
 // Endpoint to download CSV of productivity report
 app.get('/download-productivity-report-csv', async (req, res) => {

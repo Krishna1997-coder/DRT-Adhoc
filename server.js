@@ -211,7 +211,7 @@ app.get('/get-productivity-report', async (req, res) => {
         const { startDate, endDate } = req.query;
         try {
         // Update the URL to point to your Heroku app
-        const reportDataResponse = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/get-productivity-report?startDate=${startDate}&endDate=${endDate}`);
+        const reportDataResponse = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/dowload-productivity-report-csv?startDate=${startDate}&endDate=${endDate}`);
         
         if (!reportDataResponse.ok) {
             throw new Error('Failed to fetch productivity report data');

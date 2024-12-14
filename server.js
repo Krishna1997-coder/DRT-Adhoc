@@ -170,8 +170,9 @@ app.get('/get-productivity-report', async (req, res) => {
     }
 });
        
-       
-        // Endpoint to download CSV of productivity report
+const fetch = require('node-fetch'); // Import fetch function from node-fetch
+
+// Endpoint to download CSV of productivity report
 app.get('/download-productivity-report-csv', async (req, res) => {
     const { startDate, endDate } = req.query;
     try {
@@ -184,7 +185,6 @@ app.get('/download-productivity-report-csv', async (req, res) => {
         res.header('Content-Type', 'text/csv');
         res.attachment('productivity_report.csv');
         res.send(csv);
-
     } catch (error) {
         console.error('Error generating productivity report CSV:', error);
         res.status(500).json({ message: 'Internal Server Error' });

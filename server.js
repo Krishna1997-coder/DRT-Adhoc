@@ -92,25 +92,21 @@ app.get('/download-adhocs-csv', async (req, res) => {
     const { startDate, endDate } = req.query;
     const filter = {};
 
-    // Handle startDate filter
     if (startDate) {
         const start = new Date(startDate);
-        start.setHours(0, 0, 0, 0);  // Set start time to beginning of the day
+        start.setHours(0, 0, 0, 0);
         filter.date = { ...filter.date, $gte: start };
     }
 
-    // Handle endDate filter
     if (endDate) {
         const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);  // Set end time to end of the day
+        end.setHours(23, 59, 59, 999);
         filter.date = { ...filter.date, $lte: end };
     }
 
     try {
-        // Retrieve activities based on the filter
         const adhocs = await Adhoc.find(filter);
 
-        // If no data is found, return 404 error
         if (adhocs.length === 0) {
             return res.status(404).json({ message: 'No activities found to download.' });
         }
@@ -129,7 +125,6 @@ app.get('/download-adhocs-csv', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 
 // Endpoint to save DoD metrics data
 app.post('/save-dod-metrics', async (req, res) => {
@@ -206,37 +201,42 @@ app.get('/get-productivity-report', async (req, res) => {
                 totalProductivity: liveProductivity + totalAdhocs // Total productivity in hours
             });
         }
-       // Endpoint to download CSV of productivity report
-        app.get('/download-productivity-report-csv', async (req, res) => {
-        const { startDate, endDate } = req.query;
-        try {
-        // Update the URL to point to your Heroku app
-        const reportDataResponse = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/dowload-productivity-report-csv?startDate=${startDate}&endDate=${endDate}`);
-        
-        if (!reportDataResponse.ok) {
-            throw new Error('Failed to fetch productivity report data');
+
+        res.status(200).json(reportData);
+
+    } catch (error) {
+        console.error('Error generating productivity report:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+       
+// Endpoint to download CSV of productivity report
+app.get('/download-productivity-report-csv', async (req, res) => {
+    const { startDate, endDate } = req.query;
+    
+    try {
+        const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/get-productivity-report?startDate=${startDate}&endDate=${endDate}`);
+        const productivityData = await response.json();
+
+        if (!productivityData.length) {
+            return res.status(404).json({ message: 'No data found to download.' });
         }
 
-        const reportData = await reportDataResponse.json();
-        
-        // Create CSV from the report data
-        const csvParser = new Parser({ fields: ['loginID', 'jobCount', 'takt', 'totalAdhocs', 'liveProductivity', 'totalProductivity'] });
-        const csv = csvParser.parse(reportData);
-        
-        // Send the CSV as a downloadable file
+        const csvParser = new Parser({
+            fields: ['loginID', 'jobCount', 'takt', 'liveProductivity', 'totalAdhocs', 'totalProductivity']
+        });
+        const csv = csvParser.parse(productivityData);
+
         res.header('Content-Type', 'text/csv');
         res.attachment('productivity_report.csv');
         res.send(csv);
-
     } catch (error) {
         console.error('Error generating productivity report CSV:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
-
 // Start the server
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server running on port ${port}`);
 });
-     

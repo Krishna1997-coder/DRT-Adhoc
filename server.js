@@ -62,7 +62,7 @@ app.post('/submit', [
 
 // Endpoint to retrieve past adhoc activities with optional date filtering
 app.get('/adhocs', async (req, res) => {
-    const { startDate, endDate, loginID } = req.query;
+    const { startDate, endDate } = req.query;
     const filter = {};
 
     if (startDate) {
@@ -75,10 +75,6 @@ app.get('/adhocs', async (req, res) => {
         const end = new Date(endDate);
         end.setHours(23, 59, 59, 999);
         filter.date = { ...filter.date, $lte: end };
-    }
-
-    if (loginID) {
-        filter.loginID = loginID;
     }
 
     try {
@@ -151,7 +147,7 @@ app.get('/get-productivity-report', async (req, res) => {
                 takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
             } else {
                 const totalTakt = dodMetricData.reduce((sum, item) => sum + (item.takt * item.jobCount), 0);
-                takt = totalTakt / jobCount; // Average TAKT calculation using your formula
+                takt = jobCount > 0 ? totalTakt / jobCount : 0; // Average TAKT calculation using your formula
             }
 
             const liveProductivity = (jobCount * takt) / 3600; // Convert live productivity to hours
@@ -173,8 +169,9 @@ app.get('/get-productivity-report', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
-// Endpoint to download CSV of productivity report
+       
+       
+        // Endpoint to download CSV of productivity report
 app.get('/download-productivity-report-csv', async (req, res) => {
     const { startDate, endDate } = req.query;
     try {
@@ -198,3 +195,4 @@ app.get('/download-productivity-report-csv', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+     

@@ -1,7 +1,6 @@
 document.getElementById('loadMetricsBtn').addEventListener('click', async () => {
     const date = document.getElementById('dodDate').value;
 
-    // Validate if the date is provided
     if (!date) {
         alert("Please select a date.");
         return;
@@ -23,14 +22,12 @@ async function loadMetrics(date) {
     tbody.innerHTML = ''; // Clear existing rows
 
     try {
-        // Fetch existing metrics for the selected date
         const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/get-dod-metrics?date=${date}`);
         if (!response.ok) {
             throw new Error('Error fetching existing metrics');
         }
         const existingMetrics = await response.json();
 
-        // Create a map for quick lookup of existing metrics by loginID
         const metricsMap = new Map();
         existingMetrics.forEach(metric => {
             metricsMap.set(metric.loginID, metric);
@@ -41,28 +38,25 @@ async function loadMetrics(date) {
             row.insertCell(0).innerText = auditor;
 
             if (metricsMap.has(auditor)) {
-                // If metrics exist, display the saved data and disable inputs
                 const metric = metricsMap.get(auditor);
                 row.insertCell(1).innerText = metric.jobCount;
                 row.insertCell(2).innerText = metric.takt;
-                row.insertCell(3).innerText = ((metric.jobCount * metric.takt) / 3600).toFixed(2); // Live productivity (hrs)
+                row.insertCell(3).innerText = ((metric.jobCount * metric.takt) / 3600).toFixed(2); // Live productivity
             } else {
-                // Allow input for auditors without saved metrics
                 row.insertCell(1).innerHTML = '<input type="number" class="jobCount" value="0">';
                 row.insertCell(2).innerHTML = '<input type="number" class="takt" value="0">';
-                row.insertCell(3).innerText = '0'; // Live productivity will be calculated later
+                row.insertCell(3).innerText = '0'; // Live productivity
             }
         });
     } catch (error) {
         console.error('Error loading metrics:', error);
-        alert('Error loading metrics data');
+        alert(`Error loading metrics: ${error.message}`);
     }
 }
 
 document.getElementById('saveMetricsBtn').addEventListener('click', async () => {
     const date = document.getElementById('dodDate').value;
     const tableRows = document.querySelectorAll('#dodMetricsTable tbody tr');
-
     const metricsData = [];
 
     tableRows.forEach(row => {
@@ -74,11 +68,9 @@ document.getElementById('saveMetricsBtn').addEventListener('click', async () => 
             const jobCount = parseInt(jobCountInput.value, 10);
             const takt = parseFloat(taktInput.value);
 
-            // Calculate live productivity
             const liveProductivity = (jobCount * takt) / 3600; // Convert to hours
             row.cells[3].innerText = liveProductivity.toFixed(2); // Update live productivity cell
 
-            // Collect data to send to the backend
             metricsData.push({
                 date,
                 loginID,
@@ -89,7 +81,6 @@ document.getElementById('saveMetricsBtn').addEventListener('click', async () => 
         }
     });
 
-    // Send data to backend for saving
     try {
         const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/save-dod-metrics', {
             method: 'POST',
@@ -110,4 +101,3 @@ document.getElementById('saveMetricsBtn').addEventListener('click', async () => 
         alert('Error saving data');
     }
 });
- 

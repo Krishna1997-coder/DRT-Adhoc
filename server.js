@@ -134,20 +134,31 @@ app.post('/save-dod-metrics', async (req, res) => {
             });
 
             if (existingMetric) {
-                return res.status(400).json({
-                    message: `Metrics for loginID ${metric.loginID} on ${metric.date} are already saved and cannot be modified.`,
+                // Check if jobCount and takt are zero for existing entry, only then allow editing
+                if (existingMetric.jobCount !== 0 || existingMetric.takt !== 0) {
+                    return res.status(400).json({
+                        message: `Metrics for loginID ${metric.loginID} on ${metric.date} are locked and cannot be modified.`,
+                    });
+                }
+
+                // Update existing metric with new values
+                existingMetric.jobCount = metric.jobCount;
+                existingMetric.takt = metric.takt;
+                existingMetric.liveProductivity = metric.liveProductivity;
+
+                await existingMetric.save();
+            } else {
+                // Create new metric if it does not exist
+                const newDodMetric = new DodMetrics({
+                    date: new Date(metric.date),
+                    loginID: metric.loginID,
+                    jobCount: metric.jobCount,
+                    takt: metric.takt,
+                    liveProductivity: metric.liveProductivity,
                 });
+
+                await newDodMetric.save();
             }
-
-            const newDodMetric = new DodMetrics({
-                date: metric.date,
-                loginID: metric.loginID,
-                jobCount: metric.jobCount,
-                takt: metric.takt,
-                liveProductivity: metric.liveProductivity,
-            });
-
-            await newDodMetric.save();
         }
 
         res.status(200).json({ message: 'Metrics saved successfully!' });
@@ -166,15 +177,23 @@ app.get('/get-dod-metrics', async (req, res) => {
     }
 
     try {
-        // Convert the date query parameter into a valid Date object
         const metricsDate = new Date(date);
         const existingMetrics = await DodMetrics.find({ date: metricsDate });
 
         if (existingMetrics.length === 0) {
-            return res.status(404).json({ message: 'No metrics found for the given date.' });
-        }
+            // If no metrics, return default metrics with zeros for all loginIDs
+            const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
-        console.log('Existing Metrics:', existingMetrics); // For debugging purposes
+            const defaultMetrics = fixedAuditors.map(loginID => ({
+                loginID,
+                jobCount: 0,
+                takt: 0,
+                liveProductivity: 0,
+                date: metricsDate
+            }));
+
+            return res.status(200).json(defaultMetrics);
+        }
 
         res.status(200).json(existingMetrics);
     } catch (error) {
@@ -220,9 +239,6 @@ app.get('/get-productivity-report', async (req, res) => {
 
             reportData.push({
                 loginID: auditor,
-                jobCount,
-                takt,
-                liveProductivity,
                 totalAdhocs,
                 totalProductivity: liveProductivity + totalAdhocs,
             });
@@ -264,5 +280,5 @@ app.get('/download-productivity-report-csv', async (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server is running on port ${port}`);
 });

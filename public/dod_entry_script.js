@@ -51,7 +51,7 @@ async function loadMetrics() {
             row.appendChild(taktCell);
             
             const liveProductivityCell = document.createElement('td');
-            liveProductivityCell.textContent = (metric.jobCount * metric.takt) / 3600;
+            liveProductivityCell.textContent = ((metric.jobCount * metric.takt) / 3600).toFixed(2);
             row.appendChild(liveProductivityCell);
             
             tableBody.appendChild(row);
@@ -74,11 +74,12 @@ async function saveMetrics() {
         const loginID = row.querySelector('td').textContent;
         const jobCount = row.querySelector('.jobCountInput') ? row.querySelector('.jobCountInput').value : row.querySelector('td:nth-child(2)').textContent;
         const takt = row.querySelector('.taktInput') ? row.querySelector('.taktInput').value : row.querySelector('td:nth-child(3)').textContent;
+        const liveProductivity = ((parseInt(jobCount, 10) * parseInt(takt, 10)) / 3600).toFixed(2); // Limit to 2 decimal places
         metricsData.push({
             loginID,
             jobCount: parseInt(jobCount, 10),
             takt: parseInt(takt, 10),
-            liveProductivity: (parseInt(jobCount, 10) * parseInt(takt, 10)) / 3600 // Example calculation for live productivity
+            liveProductivity: parseFloat(liveProductivity) // Convert back to number if needed
         });
     });
     try {

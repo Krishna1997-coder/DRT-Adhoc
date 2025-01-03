@@ -6,11 +6,10 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { body, validationResult } = require('express-validator');
 const { Parser } = require('json2csv');
-const fetch = require('node-fetch'); // Import fetch function from node-fetch
 
-// Import the Adhoc and DodMetrics models
+// Import models
 const Adhoc = require('./models/adhoc');
-const DodMetrics = require('./models/dodMetrics'); // Ensure this path is correct
+const DodMetrics = require('./models/dodMetrics'); // Ensure correct path
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -23,17 +22,17 @@ app.use(express.static('public'));
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
 })
     .then(() => console.log('MongoDB connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
+    .catch((err) => console.error('MongoDB connection error:', err));
 
 // Endpoint to handle form submission (for Adhoc data)
 app.post('/submit', [
     body('loginID').notEmpty().withMessage('Login ID is required'),
     body('activity').notEmpty().withMessage('Activity is required'),
     body('date').isISO8601().withMessage('Date must be in ISO format'),
-    body('duration').isNumeric().withMessage('Duration must be a number')
+    body('duration').isNumeric().withMessage('Duration must be a number'),
 ], async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -56,7 +55,7 @@ app.post('/submit', [
         const savedActivity = await newActivity.save();
         res.status(201).json({ message: 'Activity submitted successfully!', activity: savedActivity });
     } catch (error) {
-        console.error('Error saving to MongoDB', error);
+        console.error('Error saving to MongoDB:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
@@ -82,7 +81,7 @@ app.get('/adhocs', async (req, res) => {
         const adhocs = await Adhoc.find(filter);
         res.status(200).json(adhocs);
     } catch (error) {
-        console.error('Error retrieving data from MongoDB', error);
+        console.error('Error retrieving data from MongoDB:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
@@ -111,15 +110,12 @@ app.get('/download-adhocs-csv', async (req, res) => {
             return res.status(404).json({ message: 'No activities found to download.' });
         }
 
-        // Create CSV from the adhocs data
         const csvParser = new Parser({ fields: ['loginID', 'activity', 'date', 'duration'] });
         const csv = csvParser.parse(adhocs);
 
-        // Send the CSV as a downloadable file
         res.header('Content-Type', 'text/csv');
         res.attachment('adhocs.csv');
         res.send(csv);
-
     } catch (error) {
         console.error('Error generating adhocs CSV:', error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -132,12 +128,23 @@ app.post('/save-dod-metrics', async (req, res) => {
 
     try {
         for (const metric of metricsData) {
+            const existingMetric = await DodMetrics.findOne({
+                loginID: metric.loginID,
+                date: new Date(metric.date),
+            });
+
+            if (existingMetric) {
+                return res.status(400).json({
+                    message: `Metrics for loginID ${metric.loginID} on ${metric.date} are already saved and cannot be modified.`,
+                });
+            }
+
             const newDodMetric = new DodMetrics({
                 date: metric.date,
                 loginID: metric.loginID,
                 jobCount: metric.jobCount,
                 takt: metric.takt,
-                liveProductivity: metric.liveProductivity
+                liveProductivity: metric.liveProductivity,
             });
 
             await newDodMetric.save();
@@ -158,21 +165,14 @@ app.get('/get-productivity-report', async (req, res) => {
 
     try {
         const adhocs = await Adhoc.find({
-            date: {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
-            }
+            date: { $gte: new Date(startDate), $lte: new Date(endDate) },
         });
 
         const dodMetrics = await DodMetrics.find({
-            date: {
-                $gte: new Date(startDate),
-                $lte: new Date(endDate)
-            }
+            date: { $gte: new Date(startDate), $lte: new Date(endDate) },
         });
 
         const reportData = [];
-
         const isSingleDay = new Date(startDate).toDateString() === new Date(endDate).toDateString();
 
         for (const auditor of fixedAuditors) {
@@ -187,10 +187,10 @@ app.get('/get-productivity-report', async (req, res) => {
                 takt = dodMetricData.reduce((sum, item) => sum + item.takt, 0);
             } else {
                 const totalTakt = dodMetricData.reduce((sum, item) => sum + (item.takt * item.jobCount), 0);
-                takt = jobCount > 0 ? totalTakt / jobCount : 0; // Average TAKT calculation using your formula
+                takt = jobCount > 0 ? totalTakt / jobCount : 0;
             }
 
-            const liveProductivity = (jobCount * takt) / 3600; // Convert live productivity to hours
+            const liveProductivity = (jobCount * takt) / 3600;
 
             reportData.push({
                 loginID: auditor,
@@ -198,23 +198,23 @@ app.get('/get-productivity-report', async (req, res) => {
                 takt,
                 liveProductivity,
                 totalAdhocs,
-                totalProductivity: liveProductivity + totalAdhocs // Total productivity in hours
+                totalProductivity: liveProductivity + totalAdhocs,
             });
         }
 
         res.status(200).json(reportData);
-
     } catch (error) {
         console.error('Error generating productivity report:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-       
+
 // Endpoint to download CSV of productivity report
 app.get('/download-productivity-report-csv', async (req, res) => {
     const { startDate, endDate } = req.query;
-    
+
     try {
+        // Fetch productivity report using the Heroku URL
         const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/get-productivity-report?startDate=${startDate}&endDate=${endDate}`);
         const productivityData = await response.json();
 
@@ -223,7 +223,7 @@ app.get('/download-productivity-report-csv', async (req, res) => {
         }
 
         const csvParser = new Parser({
-            fields: ['loginID', 'jobCount', 'takt', 'liveProductivity', 'totalAdhocs', 'totalProductivity']
+            fields: ['loginID', 'jobCount', 'takt', 'liveProductivity', 'totalAdhocs', 'totalProductivity'],
         });
         const csv = csvParser.parse(productivityData);
 
@@ -235,6 +235,7 @@ app.get('/download-productivity-report-csv', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
 
 // Start the server
 app.listen(port, () => {

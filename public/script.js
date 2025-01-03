@@ -85,26 +85,36 @@
     // Function to download data as CSV
     if (downloadBtn) {
         downloadBtn.addEventListener('click', async () => {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+    
+            if (!startDate || !endDate) {
+                alert("Please select a date range before downloading.");
+                return;
+            }
+    
             try {
-                const response = await fetch('https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/download-adhocs-csv');
+                const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/download-csv?startDate=${startDate}&endDate=${endDate}`);
                 if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+                    throw new Error('Failed to download CSV');
                 }
+    
                 const blob = await response.blob();
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = 'adhocs.csv';
+                a.download = 'filtered_adhocs.csv';
                 document.body.appendChild(a);
                 a.click();
                 window.URL.revokeObjectURL(url);
             } catch (error) {
                 console.error('Error downloading CSV:', error);
+                alert('Error downloading CSV');
             }
         });
     }
-
+    
     // Add event listener for the adhoc form submission
     if (adhocForm) {
         adhocForm.addEventListener('submit', async (e) => {

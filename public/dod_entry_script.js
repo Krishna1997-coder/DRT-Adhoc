@@ -10,13 +10,7 @@ document.getElementById('loadMetricsBtn').addEventListener('click', async () => 
 });
 
 async function loadMetrics(date) {
-    const fixedAuditors = [
-        'carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull',
-        'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik',
-        'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj',
-        'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo',
-        'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'
-    ];
+    const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull','gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
 
     const tbody = document.getElementById('dodMetricsTable').getElementsByTagName('tbody')[0];
     tbody.innerHTML = ''; // Clear existing rows

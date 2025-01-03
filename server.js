@@ -239,6 +239,9 @@ app.get('/get-productivity-report', async (req, res) => {
 
             reportData.push({
                 loginID: auditor,
+                jobCount,
+                takt,
+                liveProductivity,
                 totalAdhocs,
                 totalProductivity: liveProductivity + totalAdhocs,
             });
@@ -250,7 +253,6 @@ app.get('/get-productivity-report', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 // Endpoint to download CSV of productivity report
 app.get('/download-productivity-report-csv', async (req, res) => {
     const { startDate, endDate } = req.query;

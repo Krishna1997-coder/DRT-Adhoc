@@ -157,6 +157,32 @@ app.post('/save-dod-metrics', async (req, res) => {
     }
 });
 
+// Endpoint to retrieve DoD metrics for a specific date
+app.get('/get-dod-metrics', async (req, res) => {
+    const { date } = req.query;
+
+    if (!date) {
+        return res.status(400).json({ message: 'Date query parameter is required.' });
+    }
+
+    try {
+        // Convert the date query parameter into a valid Date object
+        const metricsDate = new Date(date);
+        const existingMetrics = await DodMetrics.find({ date: metricsDate });
+
+        if (existingMetrics.length === 0) {
+            return res.status(404).json({ message: 'No metrics found for the given date.' });
+        }
+
+        console.log('Existing Metrics:', existingMetrics); // For debugging purposes
+
+        res.status(200).json(existingMetrics);
+    } catch (error) {
+        console.error('Error fetching DoD metrics:', error);
+        res.status(500).json({ message: 'Error fetching metrics' });
+    }
+});
+
 // Endpoint to generate the productivity report
 app.get('/get-productivity-report', async (req, res) => {
     const { startDate, endDate } = req.query;
@@ -235,7 +261,6 @@ app.get('/download-productivity-report-csv', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 
 // Start the server
 app.listen(port, () => {

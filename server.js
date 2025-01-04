@@ -128,17 +128,22 @@ app.post('/save-dod-metrics', async (req, res) => {
 
     try {
         for (const metric of metricsData) {
+            const metricDate = new Date(metric.date);
+            if (isNaN(metricDate)) {
+                console.error('Invalid date:', metric.date);
+                continue; // Skip this metric and continue with the next one
+            }
+
             const existingMetric = await DodMetrics.findOne({
                 loginID: metric.loginID,
-                date: new Date(metric.date),
+                date: metricDate,
             });
 
             if (existingMetric) {
                 // Check if jobCount and takt are zero for existing entry, only then allow editing
                 if (existingMetric.jobCount !== 0 || existingMetric.takt !== 0) {
-                    return res.status(400).json({
-                        message: `Metrics for loginID ${metric.loginID} on ${metric.date} are locked and cannot be modified.`,
-                    });
+                    console.log(`Metrics for loginID ${metric.loginID} on ${metric.date} are locked and cannot be modified.`);
+                    continue; // Skip this metric and continue with the next one
                 }
 
                 // Update existing metric with new values
@@ -151,7 +156,7 @@ app.post('/save-dod-metrics', async (req, res) => {
             } else {
                 // Create new metric if it does not exist
                 const newDodMetric = new DodMetrics({
-                    date: new Date(metric.date),
+                    date: metricDate,
                     loginID: metric.loginID,
                     jobCount: metric.jobCount,
                     takt: metric.takt,
@@ -165,7 +170,7 @@ app.post('/save-dod-metrics', async (req, res) => {
         res.status(200).json({ message: 'Metrics saved successfully!' });
     } catch (error) {
         console.error('Error saving metrics:', error);
-        res.status(500).json({ message: 'Error saving metrics' });
+        res.status(500).json({ message: 'Error saving metrics', error: error.message });
     }
 });
 

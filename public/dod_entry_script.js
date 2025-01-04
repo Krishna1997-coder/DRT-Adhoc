@@ -96,6 +96,23 @@ async function saveMetrics() {
         const result = await response.json();
         if (response.ok) {
             document.getElementById('successMessage').style.display = 'block';
+            // Lock the cells and update live productivity
+            tableRows.forEach(row => {
+                const jobCountInput = row.querySelector('.jobCountInput');
+                const taktInput = row.querySelector('.taktInput');
+                if (jobCountInput) {
+                    jobCountInput.setAttribute('disabled', 'true');
+                    jobCountInput.parentElement.textContent = jobCountInput.value;
+                }
+                if (taktInput) {
+                    taktInput.setAttribute('disabled', 'true');
+                    taktInput.parentElement.textContent = taktInput.value;
+                }
+                const jobCount = parseInt(row.querySelector('td:nth-child(2)').textContent, 10);
+                const takt = parseInt(row.querySelector('td:nth-child(3)').textContent, 10);
+                const liveProductivityCell = row.querySelector('td:nth-child(4)');
+                liveProductivityCell.textContent = ((jobCount * takt) / 3600).toFixed(2);
+            });
         } else {
             alert(result.message || 'Error saving metrics');
         }

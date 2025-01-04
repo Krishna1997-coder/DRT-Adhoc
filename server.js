@@ -145,6 +145,7 @@ app.post('/save-dod-metrics', async (req, res) => {
                 existingMetric.jobCount = metric.jobCount;
                 existingMetric.takt = metric.takt;
                 existingMetric.liveProductivity = metric.liveProductivity;
+                existingMetric.date = metricDate; // Ensure date is in correct format
 
                 await existingMetric.save();
             } else {

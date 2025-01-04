@@ -1,14 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('loadMetricsBtn').addEventListener('click', loadMetrics);
+    document.getElementById('loadMetricsBtn').addEventListener('click', async () => {
+        const date = document.getElementById('dateSelector').value;
+        if (!date) {
+            alert("Please select a date.");
+            return;
+        }
+        await loadMetrics(date);
+    });
     document.getElementById('saveMetricsBtn').addEventListener('click', saveMetrics);
 });
 
-async function loadMetrics() {
-    const date = document.getElementById('dateSelector').value;
-    if (!date) {
-        alert("Please select a date.");
-        return;
-    }
+async function loadMetrics(date) {
     try {
         const response = await fetch(`/get-dod-metrics?date=${date}`);
         const metrics = await response.json();
@@ -79,7 +81,8 @@ async function saveMetrics() {
             loginID,
             jobCount: parseInt(jobCount, 10),
             takt: parseInt(takt, 10),
-            liveProductivity: parseFloat(liveProductivity) // Convert back to number if needed
+            liveProductivity: parseFloat(liveProductivity), // Convert back to number if needed
+            date: date // Include date in each metric object
         });
     });
     try {
@@ -88,7 +91,7 @@ async function saveMetrics() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ date, metricsData }),
+            body: JSON.stringify({ metricsData }), // Send metricsData only
         });
         const result = await response.json();
         if (response.ok) {

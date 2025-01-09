@@ -94,7 +94,7 @@
             }
     
             try {
-                const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/download-csv?startDate=${startDate}&endDate=${endDate}`);
+                const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/download-adhocs-csv?startDate=${startDate}&endDate=${endDate}`);
                 if (!response.ok) {
                     throw new Error('Failed to download CSV');
                 }

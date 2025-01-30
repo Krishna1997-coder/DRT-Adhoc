@@ -188,7 +188,7 @@ app.get('/get-dod-metrics', async (req, res) => {
 
         if (existingMetrics.length === 0) {
             // If no metrics, return default metrics with zeros for all loginIDs
-            const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm'];
+            const fixedAuditors = ['carmonsh', 'chnilotp', 'cristopy', 'dahernab', 'djerrren', 'garcjull', 'gkoteddi', 'hlasrado', 'jreyesh', 'kevjimed', 'kumarqab', 'lmuralik', 'maltezel', 'mddeepk', 'mdniz', 'melaaray', 'msnandhu', 'mugdhakj', 'panugah', 'ptimp', 'shaikyas', 'shobhpap', 'shsudhak', 'singhhqo', 'srivaesu', 'tippirer', 'ukamsuma', 'vodelm','ycharanu','chitianu','najuverk'];
 
             const defaultMetrics = fixedAuditors.map(loginID => ({
                 loginID,

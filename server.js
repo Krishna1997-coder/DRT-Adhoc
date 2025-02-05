@@ -79,57 +79,12 @@ app.get('/adhocs', async (req, res) => {
 
     try {
         const adhocs = await Adhoc.find(filter);
-
-        // Aggregate data by Login ID
-        const aggregatedData = {};
-
-        adhocs.forEach((adhoc) => {
-            if (!aggregatedData[adhoc.loginId]) {
-                aggregatedData[adhoc.loginId] = {
-                    loginId: adhoc.loginId,
-                    activities: [],
-                    totalMinutes: 0
-                };
-            }
-
-            // Add activities and minutes
-            for (let i = 1; i <= 10; i++) { // Assuming a max of 10 activities for simplicity
-                const activityField = `activity${i}`;
-                const minutesField = `minutes${i}`;
-
-                if (adhoc[activityField] && adhoc[minutesField]) {
-                    aggregatedData[adhoc.loginId].activities.push({
-                        activity: adhoc[activityField],
-                        minutes: adhoc[minutesField]
-                    });
-                    aggregatedData[adhoc.loginId].totalMinutes += adhoc[minutesField];
-                }
-            }
-        });
-
-        // Prepare the response in the desired format
-        const result = Object.values(aggregatedData).map((entry) => {
-            const tableRow = {
-                loginId: entry.loginId,
-                totalMinutes: entry.totalMinutes,
-            };
-
-            // Add activity columns
-            entry.activities.forEach((activity, index) => {
-                tableRow[`activity${index + 1}`] = activity.activity;
-                tableRow[`minutes${index + 1}`] = activity.minutes;
-            });
-
-            return tableRow;
-        });
-
-        res.status(200).json(result);
+        res.status(200).json(adhocs);
     } catch (error) {
         console.error('Error retrieving data from MongoDB:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-
 
 // Endpoint to download CSV of Adhoc activities
 app.get('/download-adhocs-csv', async (req, res) => {

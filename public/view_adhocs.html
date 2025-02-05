@@ -8,7 +8,6 @@
     <title>View Adhocs</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Styles for the filter form */
         #filterForm {
             margin-bottom: 20px;
             display: flex;
@@ -24,11 +23,26 @@
             padding: 5px;
         }
 
-        /* Styles to align the date inputs side by side */
         .date-filters {
             display: flex;
             align-items: center;
-            margin-right: 20px; /* Add space between filters and button */
+            margin-right: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
@@ -53,13 +67,17 @@
             <thead>
                 <tr>
                     <th>Login ID</th>
-                    <th>Adhoc Activity</th>
-                    <th>Duration (mins)</th>
-                    <th>Date</th>
+                    <th>Adhoc1 (Activity - Time)</th>
+                    <th>Adhoc2 (Activity - Time)</th>
+                    <th>Adhoc3 (Activity - Time)</th>
+                    <th>Adhoc4</th>
+                    <th>Adhoc5</th>
+                    <th>Adhoc6</th>
+                    <th>Total Adhoc Minutes</th>
                 </tr>
             </thead>
             <tbody>
-                <!-- Adhocs will be dynamically inserted here -->
+                <!-- Data will be inserted dynamically -->
             </tbody>
         </table>
         <button id="downloadBtn">Download CSV</button>

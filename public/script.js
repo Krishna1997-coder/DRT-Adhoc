@@ -36,26 +36,88 @@
         await loadAdhocs(); // Load all adhocs on page load
     }
 
-    // Function to load adhocs and populate the table
-    async function loadAdhocs(startDate = '', endDate = '') {
-        try {
-            const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/adhocs?startDate=${startDate}&endDate=${endDate}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            const adhocs = await response.json();
-            // Clear existing rows before adding new ones
-            if (tbody) {
-                tbody.innerHTML = '';
-                adhocs.forEach(adhoc => {
-                    addRowToTable(adhoc);
-                });
-            }
-        } catch (error) {
-            console.error('Error fetching adhocs:', error);
+   // Function to load adhocs and populate the table
+// Modified loadAdhocs function
+async function loadAdhocs(startDate = '', endDate = '') {
+    try {
+        const response = await fetch(`https://secret-anchorage-71423-d74ac8cb3804.herokuapp.com/adhocs?startDate=${startDate}&endDate=${endDate}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok ' + response.statusText);
         }
-    }
+        const adhocs = await response.json();
+        
+        // Create the header row
+        const thead = adhocsTable.getElementsByTagName('thead')[0];
+        thead.innerHTML = ''; // Clear existing headers
+        
+        // Create header row
+        const headerRow = thead.insertRow();
+        
+        // Add Login ID header
+        headerRow.insertCell().innerText = 'Login ID';
+        
+        // Add Activity headers (1-6)
+        for (let i = 1; i <= 6; i++) {
+            const activityHeader = headerRow.insertCell();
+            activityHeader.innerText = `Activity ${i}`;
+            activityHeader.classList.add('activity-header');
+        }
+        
+        // Add Duration headers (1-6)
+        for (let i = 1; i <= 6; i++) {
+            const durationHeader = headerRow.insertCell();
+            durationHeader.innerText = `Duration ${i}`;
+            durationHeader.classList.add('duration-header');
+        }
 
+        // Group adhocs by loginID
+        const groupedAdhocs = {};
+        adhocs.forEach(adhoc => {
+            if (!groupedAdhocs[adhoc.loginID]) {
+                groupedAdhocs[adhoc.loginID] = [];
+            }
+            groupedAdhocs[adhoc.loginID].push(adhoc);
+        });
+
+        // Clear and populate tbody
+        if (tbody) {
+            tbody.innerHTML = '';
+            
+            Object.entries(groupedAdhocs).forEach(([loginID, activities]) => {
+                const row = tbody.insertRow();
+                
+                // Add login ID
+                row.insertCell().innerText = loginID;
+
+                // Add all activities first
+                for (let i = 0; i < 6; i++) {
+                    const activityCell = row.insertCell();
+                    if (i < activities.length) {
+                        activityCell.innerText = activities[i].activity;
+                    } else {
+                        activityCell.innerText = '-';
+                        activityCell.classList.add('empty-cell');
+                    }
+                    activityCell.classList.add('activity-cell');
+                }
+
+                // Then add all durations
+                for (let i = 0; i < 6; i++) {
+                    const durationCell = row.insertCell();
+                    if (i < activities.length) {
+                        durationCell.innerText = activities[i].duration;
+                    } else {
+                        durationCell.innerText = '-';
+                        durationCell.classList.add('empty-cell');
+                    }
+                    durationCell.classList.add('duration-cell');
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching adhocs:', error);
+    }
+}
     // Add event listener for the filter form submission
     if (filterForm) {
         filterForm.addEventListener('submit', async (e) => {

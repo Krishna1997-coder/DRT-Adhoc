@@ -29,6 +29,36 @@
             display: flex;
             align-items: center;
             margin-right: 20px; /* Add space between filters and button */
+            #adhocsTable {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+        }
+
+
+        #adhocsTable th, #adhocsTable td {
+
+            border: 1px solid #ddd;
+
+            padding: 8px;
+
+            text-align: left;
+
+        }
+        .activity-header {
+
+            background-color: #f2f2f2;
+
+        }
+
+
+        .duration-header {
+
+            background-color: #e6e6e6;
+
+        }
         }
     </style>
 </head>
@@ -52,10 +82,8 @@
         <table id="adhocsTable">
             <thead>
                 <tr>
-                    <th>Login ID</th>
-                    <th>Adhoc Activity</th>
-                    <th>Duration (mins)</th>
-                    <th>Date</th>
+                    <th rowspan="2">Login ID</th>
+                    <!-- Dynamic headers will be inserted here by JavaScript -->
                 </tr>
             </thead>
             <tbody>

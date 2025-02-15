@@ -5,8 +5,153 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Productivity Report</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Specific styles for productivity report table */
+        .productivity-table-container {
+            width: 100%;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        #productivityReportTable {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            table-layout: fixed;
+            margin-top: 20px;
+            background-color: white;
+        }
+
+        #productivityReportTable th, 
+        #productivityReportTable td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+            word-wrap: break-word;
+            word-break: break-word;
+            vertical-align: middle;
+        }
+
+        #productivityReportTable th {
+            background-color: #f5f5f5;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        #productivityReportTable td:first-child {
+            /* Login ID column */
+            font-weight: bold;
+            background-color: #f5f5f5;
+            text-align: left;
+        }
+
+        #productivityReportTable tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        #productivityReportTable tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Column widths */
+        #productivityReportTable th:nth-child(1),
+        #productivityReportTable td:nth-child(1) {
+            width: 15%; /* Login ID */
+        }
+
+        #productivityReportTable th:nth-child(2),
+        #productivityReportTable td:nth-child(2) {
+            width: 15%; /* Job Count */
+        }
+
+        #productivityReportTable th:nth-child(3),
+        #productivityReportTable td:nth-child(3) {
+            width: 15%; /* TAKT */
+        }
+
+        #productivityReportTable th:nth-child(4),
+        #productivityReportTable td:nth-child(4),
+        #productivityReportTable th:nth-child(5),
+        #productivityReportTable td:nth-child(5),
+        #productivityReportTable th:nth-child(6),
+        #productivityReportTable td:nth-child(6) {
+            width: 18%; /* Productivity columns */
+        }
+
+        /* Button styling */
+        #downloadProductivityBtn {
+            margin: 20px 0;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #downloadProductivityBtn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Filter form styling */
+        #filterForm {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        #filterForm input[type="date"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        #loadReportBtn {
+            padding: 8px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #loadReportBtn:hover {
+            background-color: #218838;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            #productivityReportTable {
+                font-size: 12px;
+            }
+
+            #productivityReportTable th, 
+            #productivityReportTable td {
+                padding: 8px;
+            }
+
+            #filterForm {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #filterForm input[type="date"],
+            #loadReportBtn {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Wrap your table in a container div -->
     <header>
         <h1><a href="index.html">DRT Productivity tool</a></h1>
     </header>
@@ -20,21 +165,23 @@
             <button type="button" id="loadReportBtn">Filter</button>
         </form>
 
-        <table id="productivityReportTable">
-            <thead>
-                <tr>
-                    <th>Login ID</th>
-                    <th>Job Count</th>
-                    <th>TAKT</th>
-                    <th>Live Productivity (hrs)</th>
-                    <th>Total Adhocs (hrs)</th>
-                    <th>Total Productivity (hrs)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Report data will be dynamically inserted here -->
-            </tbody>
-        </table>
+        <div class="productivity-table-container">
+            <table id="productivityReportTable">
+                <thead>
+                    <tr>
+                        <th>Login ID</th>
+                        <th>Job Count</th>
+                        <th>TAKT</th>
+                        <th>Live Productivity (hrs)</th>
+                        <th>Total Adhocs (hrs)</th>
+                        <th>Total Productivity (hrs)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Report data will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </div>
 
         <button id="downloadProductivityBtn">Download CSV</button>
     </main>

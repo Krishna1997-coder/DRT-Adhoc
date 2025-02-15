@@ -6,13 +6,15 @@
     <title>View Productivity Report</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Specific styles for productivity report table */
+        /* Table container styles */
         .productivity-table-container {
             width: 100%;
             margin: 20px 0;
             overflow-x: auto;
+            max-height: 60vh;   /* Limit the height to 60% of the viewport */
+            overflow-y: auto;   /* Enable vertical scrolling */
         }
-
+    
         #productivityReportTable {
             width: 100%;
             border-collapse: collapse;
@@ -21,17 +23,17 @@
             margin-top: 20px;
             background-color: white;
         }
-
+    
         #productivityReportTable th, 
         #productivityReportTable td {
-            padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #333;  /* Darker border as per original styles */
+            padding: 10px;          /* Padding from original styles */
             text-align: center;
             word-wrap: break-word;
             word-break: break-word;
             vertical-align: middle;
         }
-
+    
         #productivityReportTable th {
             background-color: #f5f5f5;
             font-weight: bold;
@@ -39,38 +41,38 @@
             top: 0;
             z-index: 1;
         }
-
+    
         #productivityReportTable td:first-child {
             /* Login ID column */
             font-weight: bold;
             background-color: #f5f5f5;
             text-align: left;
         }
-
+    
         #productivityReportTable tr:nth-child(even) {
             background-color: #fafafa;
         }
-
+    
         #productivityReportTable tr:hover {
-            background-color: #f0f0f0;
+            background-color: #e9ecef;  /* Hover color from original styles */
         }
-
+    
         /* Column widths */
         #productivityReportTable th:nth-child(1),
         #productivityReportTable td:nth-child(1) {
             width: 15%; /* Login ID */
         }
-
+    
         #productivityReportTable th:nth-child(2),
         #productivityReportTable td:nth-child(2) {
             width: 15%; /* Job Count */
         }
-
+    
         #productivityReportTable th:nth-child(3),
         #productivityReportTable td:nth-child(3) {
             width: 15%; /* TAKT */
         }
-
+    
         #productivityReportTable th:nth-child(4),
         #productivityReportTable td:nth-child(4),
         #productivityReportTable th:nth-child(5),
@@ -79,7 +81,7 @@
         #productivityReportTable td:nth-child(6) {
             width: 18%; /* Productivity columns */
         }
-
+    
         /* Button styling */
         #downloadProductivityBtn {
             margin: 20px 0;
@@ -90,11 +92,11 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
+    
         #downloadProductivityBtn:hover {
             background-color: #0056b3;
         }
-
+    
         /* Filter form styling */
         #filterForm {
             display: flex;
@@ -106,13 +108,13 @@
             background-color: #f8f9fa;
             border-radius: 5px;
         }
-
+    
         #filterForm input[type="date"] {
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-
+    
         #loadReportBtn {
             padding: 8px 20px;
             background-color: #28a745;
@@ -121,31 +123,39 @@
             border-radius: 4px;
             cursor: pointer;
         }
-
+    
         #loadReportBtn:hover {
             background-color: #218838;
         }
-
+    
         /* Responsive design */
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {  /* Changed to 600px to match original */
             #productivityReportTable {
                 font-size: 12px;
             }
-
+    
             #productivityReportTable th, 
             #productivityReportTable td {
                 padding: 8px;
             }
-
+    
             #filterForm {
                 flex-direction: column;
                 align-items: stretch;
             }
-
+    
             #filterForm input[type="date"],
             #loadReportBtn {
-                width: 100%;
+                width: 100%; /* Full width on small screens */
                 margin: 5px 0;
+            }
+    
+            .button {
+                width: 100%; /* Make buttons full width on small screens */
+            }
+            
+            input, select {
+                width: 100%; /* Make inputs full width on small screens */
             }
         }
     </style>
